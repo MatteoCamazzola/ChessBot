@@ -1,9 +1,9 @@
+from src.pieces.pawn import Pawn
 from src.pieces.knight import Knight
 from src.pieces.bishop import Bishop
 from src.pieces.king import King
-from src.pieces.pawn import Pawn
-from src.pieces.queen import Queen
 from src.pieces.rook import Rook
+from src.pieces.queen import Queen
 
 
 class Board:
@@ -15,41 +15,41 @@ class Board:
 
         # make all our pieces
 
-        pawn_black_1 = Pawn("black",6,0)
-        pawn_black_2 = Pawn("black",6,1)
-        pawn_black_3 = Pawn("black",6,2)
-        pawn_black_4 = Pawn("black",6,3)
-        pawn_black_5 = Pawn("black",6,4)
-        pawn_black_6 = Pawn("black",6,5)
-        pawn_black_7 = Pawn("black",6,6)
-        pawn_black_8 = Pawn("black",6,7)
+        pawn_black_1 = Pawn("black", 6, 0)
+        pawn_black_2 = Pawn("black", 6, 1)
+        pawn_black_3 = Pawn("black", 6, 2)
+        pawn_black_4 = Pawn("black", 6, 3)
+        pawn_black_5 = Pawn("black", 6, 4)
+        pawn_black_6 = Pawn("black", 6, 5)
+        pawn_black_7 = Pawn("black", 6, 6)
+        pawn_black_8 = Pawn("black", 6, 7)
 
-        rook_black_1 = Rook("black",7,0)
-        rook_black_2 = Rook("black",7,7)
-        knight_black_1 = Knight("black",7,1)
-        knight_black_2 = Knight("black",7,6)
-        bishop_black_1 = Bishop("black",7,2)
-        bishop_black_2 = Bishop("black",7,5)
-        queen_black = Queen("black",7,3)
-        king_black = King("black",7,4)
+        rook_black_1 = Rook("black", 7, 0)
+        rook_black_2 = Rook("black", 7, 7)
+        knight_black_1 = Knight("black", 7, 1)
+        knight_black_2 = Knight("black", 7, 6)
+        bishop_black_1 = Bishop("black", 7, 2)
+        bishop_black_2 = Bishop("black", 7, 5)
+        queen_black = Queen("black", 7, 4)
+        king_black = King("black", 7, 3)
 
-        pawn_white_1 = Pawn("white",1,0)
-        pawn_white_2 = Pawn("white",1,1)
-        pawn_white_3 = Pawn("white",1,2)
-        pawn_white_4 = Pawn("white",1,3)
-        pawn_white_5 = Pawn("white",1,4)
-        pawn_white_6 = Pawn("white",1,5)
-        pawn_white_7 = Pawn("white",1,6)
-        pawn_white_8 = Pawn("white",1,7)
+        pawn_white_1 = Pawn("white", 1, 0)
+        pawn_white_2 = Pawn("white", 1, 1)
+        pawn_white_3 = Pawn("white", 1, 2)
+        pawn_white_4 = Pawn("white", 1, 3)
+        pawn_white_5 = Pawn("white", 1, 4)
+        pawn_white_6 = Pawn("white", 1, 5)
+        pawn_white_7 = Pawn("white", 1, 6)
+        pawn_white_8 = Pawn("white", 1, 7)
 
-        rook_white_1 = Rook("white",0,0)
-        rook_white_2 = Rook("white",0,7)
-        knight_white_1 = Knight("white",0,1)
-        knight_white_2 = Knight("white",0,6)
-        bishop_white_1 = Bishop("white",0,2)
-        bishop_white_2 = Bishop("white",0,5)
-        queen_white = Queen("white",0,3)
-        king_white = King("white",0,4)
+        rook_white_1 = Rook("white", 0, 0)
+        rook_white_2 = Rook("white", 0, 7)
+        knight_white_1 = Knight("white", 0, 1)
+        knight_white_2 = Knight("white", 0, 6)
+        bishop_white_1 = Bishop("white", 0, 2)
+        bishop_white_2 = Bishop("white", 0, 5)
+        queen_white = Queen("white", 0, 4)
+        king_white = King("white", 0, 3)
 
         # put pieces on board
         self.chessBoard[rook_white_1.position[0]][rook_white_1.position[1]] = rook_white_1
@@ -91,7 +91,7 @@ class Board:
     @staticmethod
     def coordinates_to_index(coordinate):
         if coordinate[0] in "abcdefgh" and coordinate[1] in "12345678":
-            row = int(coordinate[1])-1
+            row = int(coordinate[1]) - 1
             col = ord(coordinate[0]) - ord("a")
             return row, col
         else:
@@ -101,15 +101,8 @@ class Board:
     def index_to_coordinate(row, column):
         if -1 < row < 8 and -1 < column < 8:
             coordinate = [None, None];
-            coordinate[0] = chr(column+97)
-            coordinate[1] = chr(row+49)
+            coordinate[0] = chr(column + 97)
+            coordinate[1] = chr(row + 49)
             return coordinate
         else:
             return "Invalid"
-
-
-
-
-
-
-

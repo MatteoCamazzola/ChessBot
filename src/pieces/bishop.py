@@ -1,7 +1,6 @@
-from PIL import Image, ImageTk
-class Bishop:
+from src.pieces.Chess_Piece import ChessPiece
+
+
+class Bishop(ChessPiece):
     def __init__(self, colour, row, col):
-        self.blackOrWhite = colour
-        self.position = (row, col)
-
-
+        super().__init__(colour, row, col, "bishop")

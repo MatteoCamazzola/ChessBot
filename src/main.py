@@ -33,6 +33,4 @@ def place_pieces():
 
 draw_chessboard()
 place_pieces()
-
-
 root.mainloop()

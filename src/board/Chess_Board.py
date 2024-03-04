@@ -110,18 +110,7 @@ class Board:
     def valid_moves(self, row, col, current_position):
         list_of_moves = []
         piece = self.chessBoard[current_position[0]][current_position[1]]
-        if piece.piece_type == "bishop":
-            list_of_moves = piece.valid_move()
-        if piece.piece_type == "knight":
-            pass
-        if piece.piece_type == "queen":
-            pass
-        if piece.piece_type == "rook":
-            pass
-        if piece.piece_type == "king":
-            pass
-        if piece.piece_type == "pawn":
-            pass
+        list_of_moves = piece.valid_move()
         return list_of_moves
 
 

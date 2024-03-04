@@ -1,5 +1,6 @@
 from PIL import Image, ImageTk
 
+
 class ChessPiece:
     def __init__(self, colour, row, col, piece_type):
         self.colour = colour

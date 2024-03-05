@@ -108,13 +108,17 @@ class Board:
             return "Invalid"
 
     def valid_moves(self, row, col, current_position):
-        list_of_moves = []
         piece = self.chessBoard[current_position[0]][current_position[1]]
         list_of_moves = piece.valid_move()
-
         return list_of_moves
-    def landing_on_own_piece(self,list_of_moves):
-        pass
+
+    def filter_own_pieces_moves(self, list_of_moves, piece):
+        for move in list_of_moves:
+            x, y = move
+            other_piece = self.chessBoard[x][y]
+            if other_piece is not None and piece.colour == other_piece.colour:
+                list_of_moves.remove(move)
+
 
     def blocking_pieces(self,list_of_moves,current_position):
         #every piece except for knight and king

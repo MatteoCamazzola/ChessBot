@@ -108,11 +108,16 @@ class Board:
             return "Invalid"
 
     def valid_moves(self, row, col, current_position):
+        list_of_moves= []
         piece = self.chessBoard[current_position[0]][current_position[1]]
-        list_of_moves = piece.valid_move()
+        if piece.piece_type == "knight" and piece.piece_type == "king":
+         list_of_moves = piece.valid_move()
+        else:
+            self.blocking_pieces(list_of_moves, piece)
+        self.landing_on_own_piece(list_of_moves, piece)
         return list_of_moves
 
-    def filter_own_pieces_moves(self, list_of_moves, piece):
+    def landing_on_own_piece(self, list_of_moves, piece):
         for move in list_of_moves:
             x, y = move
             other_piece = self.chessBoard[x][y]
@@ -120,10 +125,12 @@ class Board:
                 list_of_moves.remove(move)
 
 
-    def blocking_pieces(self,list_of_moves,current_position):
-        #every piece except for knight and king
-        #
-        pass
+
+    def blocking_pieces(self, list_of_moves, piece):
+        if piece.piece_type == "bishop":
+            self.bishop_valid_moves(list_of_moves, piece)
+        elif piece.piece_type == "rook":
+            pass
 
     def check_move_filter(self):
         pass
@@ -133,3 +140,49 @@ class Board:
 
     def is_valid_move(self, valid_moves):
         pass
+
+    def bishop_valid_moves(self, valid_moves, piece):
+        current_row = piece.position[0]
+        current_col = piece.position[1]
+
+        row_temp = current_row
+        col_temp = current_col
+
+        # diagonal one
+        while (row_temp + 1) < 8 and (col_temp + 1) < 8:
+            if self.chessBoard[row_temp + 1][col_temp + 1] != None:
+                break
+            row_temp = row_temp + 1
+            col_temp = col_temp + 1
+            valid_moves.append(row_temp)
+            valid_moves.append(col_temp)
+        # diagonal two
+        row_temp = current_row
+        col_temp = current_col
+        while (row_temp - 1) > -1 and (col_temp - 1) > -1:
+            if self.chessBoard[row_temp - 1][col_temp - 1] != None:
+                break
+            row_temp = row_temp - 1
+            col_temp = col_temp - 1
+            valid_moves.append(row_temp)
+            valid_moves.append(col_temp)
+        row_temp = current_row
+        col_temp = current_col
+        # diagonal three
+        while (row_temp + 1) < 8 and (col_temp - 1) > -1:
+            if self.chessBoard[row_temp + 1][col_temp - 1] != None:
+                break
+            row_temp = row_temp + 1
+            col_temp = col_temp - 1
+            valid_moves.append(row_temp)
+            valid_moves.append(col_temp)
+        row_temp = current_row
+        col_temp = current_col
+        # diagonal four
+        while (row_temp - 1) > -1 and (col_temp + 1) < 8:
+            if self.chessBoard[row_temp - 1][col_temp + 1] != None:
+                break
+            row_temp = row_temp - 1
+            col_temp = col_temp + 1
+            valid_moves.append(row_temp)
+            valid_moves.append(col_temp)

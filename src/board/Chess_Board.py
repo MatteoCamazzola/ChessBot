@@ -115,7 +115,7 @@ class Board:
             list_of_moves = piece.valid_move()
         else:
             self.blocking_pieces(list_of_moves, piece)
-            self.landing_on_own_piece(list_of_moves, piece)
+        possible_captures=self.landing_on_own_piece(list_of_moves, piece)
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
@@ -132,8 +132,7 @@ class Board:
                 possible_captures.append((capture_row, capture_col))
 
 
-            elif other_piece is not None and piece.piece_type == "pawn" and abs(
-                    piece.position[0] - other_piece.position[0]) == 1:
+            elif other_piece is not None and piece.piece_type == "pawn" and abs(piece.position[0] - other_piece.position[0]) == 1:
                 list_of_moves.clear()
                 pass
             elif other_piece is not None and piece.piece_type == "pawn":

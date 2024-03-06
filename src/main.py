@@ -33,10 +33,11 @@ def place_pieces():
                                     anchor="center")
 
 
-current_position = (4, 4)
+current_position = (3, 3)
 valid_moves = gameBoard.valid_moves(current_position)
-gameBoard.move_white_king(0,4)
-gameBoard.white_king_location()
+possible_captures = gameBoard.possible_captures(valid_moves, gameBoard.chessBoard[3][3])
+
+
 draw_chessboard()
 place_pieces()
 root.mainloop()

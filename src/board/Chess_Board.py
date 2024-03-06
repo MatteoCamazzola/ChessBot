@@ -28,9 +28,9 @@ class Board:
         rook_black_2 = Rook("black", 7, 7)
         knight_black_1 = Knight("black", 7, 1)
         knight_black_2 = Knight("black", 7, 6)
-        bishop_black_1 = Bishop("black", 4, 4)
+        bishop_black_1 = Bishop("black", 7, 2)
         bishop_black_2 = Bishop("black", 7, 5)
-        queen_black = Queen("black", 7, 4)
+        queen_black = Queen("black", 3, 3)
         king_black = King("black", 7, 3)
 
         pawn_white_1 = Pawn("white", 1, 0)
@@ -88,7 +88,6 @@ class Board:
         self.chessBoard[pawn_black_7.position[0]][pawn_black_7.position[1]] = pawn_black_7
         self.chessBoard[pawn_black_8.position[0]][pawn_black_8.position[1]] = pawn_black_8
 
-
         self.white_king_starting_pos = (0, 3)
         self.captured_pieces = [["white"], ["black"]]
 
@@ -122,26 +121,18 @@ class Board:
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
-        possible_captures = []
         for move in list_of_moves:
             x, y = move
             other_piece = self.chessBoard[x][y]
 
             if other_piece is not None and piece.colour == other_piece.colour and piece.piece_type != "pawn":
                 list_of_moves.remove(move)
-            elif other_piece is not None and piece.colour != other_piece.colour and piece.piece_type != "pawn":
-                capture_row = other_piece.position[0]
-                capture_col = other_piece.position[1]
-                possible_captures.append((capture_row, capture_col))
-
-
-            elif other_piece is not None and piece.piece_type == "pawn" and abs(piece.position[0] - other_piece.position[0]) == 1:
+            elif other_piece is not None and piece.piece_type == "pawn" and abs(
+                    piece.position[0] - other_piece.position[0]) == 1:
                 list_of_moves.clear()
                 pass
             elif other_piece is not None and piece.piece_type == "pawn":
                 list_of_moves.remove(move)
-        return possible_captures
-
 
     def blocking_pieces(self, list_of_moves, piece):
         if piece.piece_type == "bishop":
@@ -156,15 +147,16 @@ class Board:
 
     def white_king_location(self):
         return self.white_king_pos
+
     def move_white_king(self, new_row, new_col):
         self.white_king_pos = (new_row, new_col)
-
 
     def is_check(self):
         self.white_king_pos
 
-    def is_valid_move(self, valid_moves):
-        pass
+    def is_valid_move(self, row, col, valid_moves):
+        if (row, col) in valid_moves:
+            return True
 
     def bishop_valid_moves(self, valid_moves, piece):
         current_row = piece.position[0]
@@ -289,15 +281,24 @@ class Board:
         self.rook_valid_moves(valid_moves, piece)
         self.bishop_valid_moves(valid_moves, piece)
 
-    # this function will modify the actual board and place
+    def possible_captures(self, list_of_moves, piece):
+        possible_captures = []
+        for move in list_of_moves:
+            x, y = move
+            other_piece = self.chessBoard[x][y]
+            if other_piece is not None and piece.colour != other_piece.colour and piece.piece_type != "pawn":
+                capture_row = other_piece.position[0]
+                capture_col = other_piece.position[1]
+                possible_captures.append((capture_row, capture_col))
+        return possible_captures
+
     def capture_handler(self, capturer, capturee):
         pass
 
-    #assuming that the move is valid
-    def make_move(self, row, col, list_of_moves, ):
-
-
-
+    # assuming that the move is valid
+    def make_move(self, row, col, list_of_moves, piece_to_move):
+        possible_captures = self.possible_captures(list_of_moves, piece_to_move)
         if (row, col) in possible_captures:
-            self.capture_handler(piece, self.chessBoard[row][col])
-
+            self.capture_handler(piece_to_move, self.chessBoard[row][col])
+        else:
+            pass

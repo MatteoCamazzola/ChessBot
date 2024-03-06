@@ -121,10 +121,10 @@ class Board:
         for move in list_of_moves:
             x, y = move
             other_piece = self.chessBoard[x][y]
-            if other_piece is not None and piece.colour == other_piece.colour:
+            if other_piece is not None and piece.colour == other_piece.colour and piece.piece_type!= "pawn":
                 list_of_moves.remove(move)
             if piece.piece_type == "pawn" and other_piece is not None:
-                list_of_moves.remove(move)
+                pass#list_of_moves.remove(move)
 
 
 

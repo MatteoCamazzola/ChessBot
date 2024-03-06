@@ -87,7 +87,10 @@ class Board:
         self.chessBoard[pawn_black_6.position[0]][pawn_black_6.position[1]] = pawn_black_6
         self.chessBoard[pawn_black_7.position[0]][pawn_black_7.position[1]] = pawn_black_7
         self.chessBoard[pawn_black_8.position[0]][pawn_black_8.position[1]] = pawn_black_8
+
+
         self.white_king_starting_pos = (0, 3)
+        self.captured_pieces = [["white"], ["black"]]
 
     @staticmethod
     def coordinates_to_index(coordinate):
@@ -108,20 +111,14 @@ class Board:
         else:
             return "Invalid"
 
-    def valid_moves(self, row, col, current_position):
+    def valid_moves(self, current_position):
         list_of_moves = []
         piece = self.chessBoard[current_position[0]][current_position[1]]
         if piece.piece_type == "knight" or piece.piece_type == "king" or piece.piece_type == "pawn":
             list_of_moves = piece.valid_move()
         else:
             self.blocking_pieces(list_of_moves, piece)
-        possible_captures = self.landing_on_own_piece(list_of_moves, piece)
-
-        #do all checks and make sure its a legal move and then we check for capture
-
-
-        if (row, col) in possible_captures:
-            self.capture_handler(piece, self.chessBoard[row][col])
+        self.landing_on_own_piece(list_of_moves, piece)
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
@@ -292,5 +289,15 @@ class Board:
         self.rook_valid_moves(valid_moves, piece)
         self.bishop_valid_moves(valid_moves, piece)
 
+    # this function will modify the actual board and place
     def capture_handler(self, capturer, capturee):
         pass
+
+    #assuming that the move is valid
+    def make_move(self, row, col, list_of_moves, ):
+
+
+
+        if (row, col) in possible_captures:
+            self.capture_handler(piece, self.chessBoard[row][col])
+

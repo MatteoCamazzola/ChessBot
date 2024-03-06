@@ -34,7 +34,7 @@ def place_pieces():
 
 
 current_position = (4, 4)
-valid_moves = gameBoard.valid_moves(2, 2, current_position)
+valid_moves = gameBoard.valid_moves(current_position)
 gameBoard.move_white_king(0,4)
 gameBoard.white_king_location()
 draw_chessboard()

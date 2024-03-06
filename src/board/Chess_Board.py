@@ -108,7 +108,7 @@ class Board:
             return "Invalid"
 
     def valid_moves(self, row, col, current_position):
-        list_of_moves= []
+        list_of_moves = []
         piece = self.chessBoard[current_position[0]][current_position[1]]
         if piece.piece_type == "knight" or piece.piece_type == "king":
             list_of_moves = piece.valid_move()
@@ -129,13 +129,13 @@ class Board:
 
 
 
-
-
     def blocking_pieces(self, list_of_moves, piece):
         if piece.piece_type == "bishop":
             self.bishop_valid_moves(list_of_moves, piece)
         elif piece.piece_type == "rook":
-            pass
+            self.rook_valid_moves(list_of_moves, piece)
+        elif piece.piece_type == "queen":
+            self.queen_valid_moves(list_of_moves, piece)
 
     def check_move_filter(self):
         pass
@@ -159,8 +159,7 @@ class Board:
                 break
             row_temp = row_temp + 1
             col_temp = col_temp + 1
-            valid_moves.append(row_temp)
-            valid_moves.append(col_temp)
+            valid_moves.append((row_temp, col_temp))
         # diagonal two
         row_temp = current_row
         col_temp = current_col
@@ -169,8 +168,7 @@ class Board:
                 break
             row_temp = row_temp - 1
             col_temp = col_temp - 1
-            valid_moves.append(row_temp)
-            valid_moves.append(col_temp)
+            valid_moves.append((row_temp, col_temp))
         row_temp = current_row
         col_temp = current_col
         # diagonal three
@@ -179,8 +177,7 @@ class Board:
                 break
             row_temp = row_temp + 1
             col_temp = col_temp - 1
-            valid_moves.append(row_temp)
-            valid_moves.append(col_temp)
+            valid_moves.append((row_temp, col_temp))
         row_temp = current_row
         col_temp = current_col
         # diagonal four
@@ -189,5 +186,56 @@ class Board:
                 break
             row_temp = row_temp - 1
             col_temp = col_temp + 1
-            valid_moves.append(row_temp)
-            valid_moves.append(col_temp)
+            valid_moves.append((row_temp, col_temp))
+
+    def rook_valid_moves(self, valid_moves, piece):
+        current_row = piece.position[0]
+        current_col = piece.position[1]
+
+        row_temp = current_row
+        col_temp = current_col
+
+        # forward
+
+        while (row_temp + 1) < 8:
+            if self.chessBoard[row_temp + 1][col_temp] != None:
+                break
+            row_temp = row_temp + 1
+            valid_moves.append((row_temp, col_temp))
+
+        row_temp = current_row
+        col_temp = current_col
+
+        # backwards
+        while (row_temp - 1) > -1:
+            if self.chessBoard[row_temp - 1][col_temp] != None:
+                break
+            row_temp = row_temp - 1
+            valid_moves.append((row_temp, col_temp))
+
+        row_temp = current_row
+        col_temp = current_col
+
+        # right
+        while (col_temp + 1) < 8:
+            if self.chessBoard[row_temp][col_temp + 1] != None:
+                break
+            col_temp = col_temp + 1
+            valid_moves.append((row_temp, col_temp))
+
+        row_temp = current_row
+        col_temp = current_col
+
+        # left
+        while (col_temp - 1) > -1:
+            if self.chessBoard[row_temp][col_temp - 1] != None:
+                break
+            col_temp = col_temp - 1
+            valid_moves.append((row_temp, col_temp))
+
+    def queen_valid_moves(self, valid_moves, piece):
+        self.rook_valid_moves(valid_moves, piece)
+        self.bishop_valid_moves(valid_moves, piece)
+
+
+

@@ -87,6 +87,7 @@ class Board:
         self.chessBoard[pawn_black_6.position[0]][pawn_black_6.position[1]] = pawn_black_6
         self.chessBoard[pawn_black_7.position[0]][pawn_black_7.position[1]] = pawn_black_7
         self.chessBoard[pawn_black_8.position[0]][pawn_black_8.position[1]] = pawn_black_8
+        self.white_king_starting_pos = (0, 3)
 
     @staticmethod
     def coordinates_to_index(coordinate):
@@ -135,7 +136,7 @@ class Board:
                 pass
             elif other_piece is not None and piece.piece_type =="pawn":
                 list_of_moves.remove(move)
-
+        return possible_captures
 
     def blocking_pieces(self, list_of_moves, piece):
         if piece.piece_type == "bishop":
@@ -148,8 +149,14 @@ class Board:
     def check_move_filter(self):
         pass
 
+    def white_king_location(self):
+        return self.white_king_pos
+    def move_white_king(self, new_row, new_col):
+        self.white_king_pos = (new_row, new_col)
+
+
     def is_check(self):
-        pass
+        self.white_king_pos
 
     def is_valid_move(self, valid_moves):
         pass
@@ -276,6 +283,4 @@ class Board:
     def queen_valid_moves(self, valid_moves, piece):
         self.rook_valid_moves(valid_moves, piece)
         self.bishop_valid_moves(valid_moves, piece)
-
-
 

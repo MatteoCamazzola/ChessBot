@@ -28,7 +28,7 @@ class Board:
         rook_black_2 = Rook("black", 7, 7)
         knight_black_1 = Knight("black", 7, 1)
         knight_black_2 = Knight("black", 7, 6)
-        bishop_black_1 = Bishop("black", 7, 2)
+        bishop_black_1 = Bishop("black", 4, 4)
         bishop_black_2 = Bishop("black", 7, 5)
         queen_black = Queen("black", 7, 4)
         king_black = King("black", 7, 3)
@@ -110,8 +110,8 @@ class Board:
     def valid_moves(self, row, col, current_position):
         list_of_moves= []
         piece = self.chessBoard[current_position[0]][current_position[1]]
-        if piece.piece_type == "knight" and piece.piece_type == "king":
-         list_of_moves = piece.valid_move()
+        if piece.piece_type == "knight" or piece.piece_type == "king":
+            list_of_moves = piece.valid_move()
         else:
             self.blocking_pieces(list_of_moves, piece)
         self.landing_on_own_piece(list_of_moves, piece)
@@ -123,6 +123,11 @@ class Board:
             other_piece = self.chessBoard[x][y]
             if other_piece is not None and piece.colour == other_piece.colour:
                 list_of_moves.remove(move)
+            if piece.piece_type == "pawn" and other_piece is not None:
+                list_of_moves.remove(move)
+
+
+
 
 
 

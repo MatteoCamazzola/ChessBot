@@ -33,8 +33,7 @@ def place_pieces():
                                     anchor="center")
 
 
-
-current_position = (7, 2)
+current_position = (4, 4)
 valid_moves = gameBoard.valid_moves(2, 2, current_position)
 
 draw_chessboard()

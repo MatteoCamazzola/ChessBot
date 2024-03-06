@@ -115,7 +115,7 @@ class Board:
             list_of_moves = piece.valid_move()
         else:
             self.blocking_pieces(list_of_moves, piece)
-        possible_captures = self.landing_on_own_piece(list_of_moves, piece)
+        return list_of_moves
 
         #do all checks and make sure its a legal move and then we check for capture
 
@@ -125,25 +125,18 @@ class Board:
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
-        possible_captures = []
         for move in list_of_moves:
             x, y = move
             other_piece = self.chessBoard[x][y]
 
             if other_piece is not None and piece.colour == other_piece.colour and piece.piece_type != "pawn":
                 list_of_moves.remove(move)
-            elif other_piece is not None and piece.colour != other_piece.colour and piece.piece_type != "pawn":
-                capture_row = other_piece.position[0]
-                capture_col = other_piece.position[1]
-                possible_captures.append((capture_row, capture_col))
-
-
             elif other_piece is not None and piece.piece_type == "pawn" and abs(piece.position[0] - other_piece.position[0]) == 1:
                 list_of_moves.clear()
                 pass
             elif other_piece is not None and piece.piece_type == "pawn":
                 list_of_moves.remove(move)
-        return possible_captures
+
 
 
     def blocking_pieces(self, list_of_moves, piece):
@@ -291,6 +284,18 @@ class Board:
     def queen_valid_moves(self, valid_moves, piece):
         self.rook_valid_moves(valid_moves, piece)
         self.bishop_valid_moves(valid_moves, piece)
+
+    def possible_captures(self, list_of_moves,piece):
+        possible_captures = []
+        for move in list_of_moves:
+            x, y = move
+            other_piece = self.chessBoard[x][y]
+            if other_piece is not None and piece.colour != other_piece.colour and piece.piece_type != "pawn":
+                capture_row = other_piece.position[0]
+                capture_col = other_piece.position[1]
+                possible_captures.append((capture_row, capture_col))
+
+
 
     def capture_handler(self, capturer, capturee):
         pass

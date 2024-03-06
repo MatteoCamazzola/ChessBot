@@ -167,7 +167,7 @@ class Board:
                 if self.chessBoard[row_temp + 1][col_temp + 1].colour == piece.colour:
                     break
                 else:
-                    valid_moves.append((row_temp, col_temp))
+                    valid_moves.append((row_temp+1, col_temp+1))
                     break
             row_temp = row_temp + 1
             col_temp = col_temp + 1
@@ -180,7 +180,7 @@ class Board:
                 if self.chessBoard[row_temp - 1][col_temp - 1].colour == piece.colour:
                     break
                 else:
-                    valid_moves.append((row_temp, col_temp))
+                    valid_moves.append((row_temp-1, col_temp-1))
                     break
             row_temp = row_temp - 1
             col_temp = col_temp - 1
@@ -193,7 +193,7 @@ class Board:
                 if self.chessBoard[row_temp + 1][col_temp - 1].colour == piece.colour:
                     break
                 else:
-                    valid_moves.append((row_temp, col_temp))
+                    valid_moves.append((row_temp+1, col_temp-1))
                     break
             row_temp = row_temp + 1
             col_temp = col_temp - 1
@@ -206,7 +206,7 @@ class Board:
                 if self.chessBoard[row_temp - 1][col_temp + 1].colour == piece.colour:
                     break
                 else:
-                    valid_moves.append((row_temp, col_temp))
+                    valid_moves.append((row_temp-1, col_temp+1))
                     break
             row_temp = row_temp - 1
             col_temp = col_temp + 1
@@ -226,7 +226,7 @@ class Board:
                 if self.chessBoard[row_temp + 1][col_temp].colour == piece.colour:
                     break
                 else:
-                    valid_moves.append((row_temp, col_temp))
+                    valid_moves.append((row_temp+1, col_temp))
                     break
             row_temp = row_temp + 1
             valid_moves.append((row_temp, col_temp))
@@ -240,7 +240,7 @@ class Board:
                 if self.chessBoard[row_temp - 1][col_temp].colour == piece.colour:
                     break
                 else:
-                    valid_moves.append((row_temp, col_temp))
+                    valid_moves.append((row_temp-1, col_temp))
                     break
             row_temp = row_temp - 1
             valid_moves.append((row_temp, col_temp))
@@ -254,7 +254,7 @@ class Board:
                 if self.chessBoard[row_temp][col_temp + 1].colour == piece.colour:
                     break
                 else:
-                    valid_moves.append((row_temp, col_temp))
+                    valid_moves.append((row_temp, col_temp+1))
                     break
             col_temp = col_temp + 1
             valid_moves.append((row_temp, col_temp))
@@ -268,7 +268,7 @@ class Board:
                 if self.chessBoard[row_temp][col_temp - 1].colour == piece.colour:
                     break
                 else:
-                    valid_moves.append((row_temp, col_temp))
+                    valid_moves.append((row_temp, col_temp-1))
                     break
             col_temp = col_temp - 1
             valid_moves.append((row_temp, col_temp))

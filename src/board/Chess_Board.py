@@ -118,8 +118,8 @@ class Board:
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
+        possible_captures = []
         for move in list_of_moves:
-            possible_captures=[]
             x, y = move
             other_piece = self.chessBoard[x][y]
 

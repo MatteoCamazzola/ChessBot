@@ -115,7 +115,14 @@ class Board:
             list_of_moves = piece.valid_move()
         else:
             self.blocking_pieces(list_of_moves, piece)
-            self.landing_on_own_piece(list_of_moves, piece)
+        possible_captures = self.landing_on_own_piece(list_of_moves, piece)
+
+        #do all checks and make sure its a legal move and then we check for capture
+
+
+        if (row, col) in possible_captures:
+            self.capture_handler(piece, self.chessBoard[row][col])
+
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
@@ -286,4 +293,7 @@ class Board:
     def queen_valid_moves(self, valid_moves, piece):
         self.rook_valid_moves(valid_moves, piece)
         self.bishop_valid_moves(valid_moves, piece)
+
+    def capture_handler(self, capturer, capturee):
+        pass
 

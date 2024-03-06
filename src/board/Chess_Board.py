@@ -164,7 +164,11 @@ class Board:
         # diagonal one
         while (row_temp + 1) < 8 and (col_temp + 1) < 8:
             if self.chessBoard[row_temp + 1][col_temp + 1] != None:
-                break
+                if self.chessBoard[row_temp + 1][col_temp + 1].colour == piece.colour:
+                    break
+                else:
+                    valid_moves.append((row_temp, col_temp))
+                    break
             row_temp = row_temp + 1
             col_temp = col_temp + 1
             valid_moves.append((row_temp, col_temp))
@@ -173,7 +177,11 @@ class Board:
         col_temp = current_col
         while (row_temp - 1) > -1 and (col_temp - 1) > -1:
             if self.chessBoard[row_temp - 1][col_temp - 1] != None:
-                break
+                if self.chessBoard[row_temp - 1][col_temp - 1].colour == piece.colour:
+                    break
+                else:
+                    valid_moves.append((row_temp, col_temp))
+                    break
             row_temp = row_temp - 1
             col_temp = col_temp - 1
             valid_moves.append((row_temp, col_temp))
@@ -182,7 +190,11 @@ class Board:
         # diagonal three
         while (row_temp + 1) < 8 and (col_temp - 1) > -1:
             if self.chessBoard[row_temp + 1][col_temp - 1] != None:
-                break
+                if self.chessBoard[row_temp + 1][col_temp - 1].colour == piece.colour:
+                    break
+                else:
+                    valid_moves.append((row_temp, col_temp))
+                    break
             row_temp = row_temp + 1
             col_temp = col_temp - 1
             valid_moves.append((row_temp, col_temp))
@@ -191,7 +203,11 @@ class Board:
         # diagonal four
         while (row_temp - 1) > -1 and (col_temp + 1) < 8:
             if self.chessBoard[row_temp - 1][col_temp + 1] != None:
-                break
+                if self.chessBoard[row_temp - 1][col_temp + 1].colour == piece.colour:
+                    break
+                else:
+                    valid_moves.append((row_temp, col_temp))
+                    break
             row_temp = row_temp - 1
             col_temp = col_temp + 1
             valid_moves.append((row_temp, col_temp))
@@ -207,7 +223,11 @@ class Board:
 
         while (row_temp + 1) < 8:
             if self.chessBoard[row_temp + 1][col_temp] != None:
-                break
+                if self.chessBoard[row_temp + 1][col_temp].colour == piece.colour:
+                    break
+                else:
+                    valid_moves.append((row_temp, col_temp))
+                    break
             row_temp = row_temp + 1
             valid_moves.append((row_temp, col_temp))
 
@@ -217,7 +237,11 @@ class Board:
         # backwards
         while (row_temp - 1) > -1:
             if self.chessBoard[row_temp - 1][col_temp] != None:
-                break
+                if self.chessBoard[row_temp - 1][col_temp].colour == piece.colour:
+                    break
+                else:
+                    valid_moves.append((row_temp, col_temp))
+                    break
             row_temp = row_temp - 1
             valid_moves.append((row_temp, col_temp))
 
@@ -227,7 +251,11 @@ class Board:
         # right
         while (col_temp + 1) < 8:
             if self.chessBoard[row_temp][col_temp + 1] != None:
-                break
+                if self.chessBoard[row_temp][col_temp + 1].colour == piece.colour:
+                    break
+                else:
+                    valid_moves.append((row_temp, col_temp))
+                    break
             col_temp = col_temp + 1
             valid_moves.append((row_temp, col_temp))
 
@@ -237,7 +265,11 @@ class Board:
         # left
         while (col_temp - 1) > -1:
             if self.chessBoard[row_temp][col_temp - 1] != None:
-                break
+                if self.chessBoard[row_temp][col_temp - 1].colour == piece.colour:
+                    break
+                else:
+                    valid_moves.append((row_temp, col_temp))
+                    break
             col_temp = col_temp - 1
             valid_moves.append((row_temp, col_temp))
 

@@ -296,4 +296,3 @@ class Board:
 
     def capture_handler(self, capturer, capturee):
         pass
-

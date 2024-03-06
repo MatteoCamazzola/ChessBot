@@ -119,14 +119,22 @@ class Board:
 
     def landing_on_own_piece(self, list_of_moves, piece):
         for move in list_of_moves:
+            possible_captures=[]
             x, y = move
             other_piece = self.chessBoard[x][y]
-            if other_piece is not None and piece.colour == other_piece.colour and piece.piece_type!= "pawn":
+
+            if other_piece is not None and piece.colour == other_piece.colour and piece.piece_type != "pawn":
                 list_of_moves.remove(move)
-            if piece.piece_type == "pawn" and other_piece is not None:
-                pass#list_of_moves.remove(move)
+            elif other_piece is not None and piece.colour != other_piece.colour and piece.piece_type != "pawn":
+                capture_row=other_piece.position[0]
+                capture_col=other_piece.position[1]
+                possible_captures.append((capture_row,capture_col))
 
-
+            elif other_piece is not None and piece.piece_type == "pawn" and abs(piece.position[0]-other_piece.position[0])==1:
+                list_of_moves.clear()
+                pass
+            elif other_piece is not None and piece.piece_type =="pawn":
+                list_of_moves.remove(move)
 
 
     def blocking_pieces(self, list_of_moves, piece):

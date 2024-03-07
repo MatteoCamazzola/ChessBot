@@ -91,6 +91,7 @@ class Board:
         self.white_king_pos = (0, 3)
         self.black_king_pos = (7, 3)
         self.captured_pieces = [["white"], ["black"]]
+        self.last_move = [None, None, None]
 
     @staticmethod
     def coordinates_to_index(coordinate):
@@ -388,14 +389,23 @@ class Board:
     # assuming that the move is valid
     # remember to update the king position in member variable
     def make_move(self, row, col, list_of_moves, piece_to_move):
-        if piece_to_move.piece_type == "king":
-            self.move_white_king(row, col)
-        if piece_to_move.piece_type == "king" or piece_to_move.piece_type == "rook":
-            piece_to_move.has_moved = True
-        possible_captures = self.possible_captures(list_of_moves, piece_to_move)
-        if (row, col) in possible_captures:
-            self.capture_handler(self.chessBoard[row][col])
-        piece_to_move.position = (row, col)
+        #handle castling
+        if self.chessBoard[row][col] != None:
+            if self.chessBoard[row][col].colour == piece_to_move.colour:
+                self.castle_handler(row, col, piece_to_move)
+                self.last_move = [None, None, None]
+
+        else:
+            if piece_to_move.piece_type == "king":
+                self.move_white_king(row, col)
+            if piece_to_move.piece_type == "king" or piece_to_move.piece_type == "rook":
+                piece_to_move.has_moved = True
+            possible_captures = self.possible_captures(list_of_moves, piece_to_move)
+            if (row, col) in possible_captures:
+                self.capture_handler(self.chessBoard[row][col])
+            piece_to_move.position = (row, col)
+            self.chessBoard[row][col] = piece_to_move
+            self.last_move = [row, col, piece_to_move.piece_type]
 
     def add_castling(self, piece, list_of_moves):
         colour = piece.colour
@@ -529,3 +539,8 @@ class Board:
             self.pawn_diagonal(piece,list_of_moves)
         return list_of_moves
 
+    def castle_handler(self, row, col, piece):
+        if piece.piece_type == "king":
+            pass
+        else:
+            pass

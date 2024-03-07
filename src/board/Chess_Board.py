@@ -234,9 +234,11 @@ class Board:
                         return True
         return False
 
-    def is_valid_move(self, row, col, valid_moves):
-        if (row, col) in valid_moves:
+    def is_valid_move(self, move, valid_moves):
+        if move in valid_moves:
             return True
+        else:
+            return False
 
     def bishop_valid_moves(self, valid_moves, piece):
         current_row = piece.position[0]

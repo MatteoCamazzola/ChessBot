@@ -22,7 +22,7 @@ class Board:
         pawn_black_5 = Pawn("black", 5, 1)
         pawn_black_6 = Pawn("black", 6, 5)
         pawn_black_7 = Pawn("black", 6, 6)
-        pawn_black_8 = Pawn("black", 6, 7)
+        pawn_black_8 = Pawn("black", 4, 7)
 
         rook_black_1 = Rook("black", 7, 0)
         rook_black_2 = Rook("black", 7, 7)
@@ -39,7 +39,7 @@ class Board:
         pawn_white_4 = Pawn("white", 2, 0)
         pawn_white_5 = Pawn("white", 2, 1)
         pawn_white_6 = Pawn("white", 1, 5)
-        pawn_white_7 = Pawn("white", 1, 6)
+        pawn_white_7 = Pawn("white", 4, 6)
         pawn_white_8 = Pawn("white", 1, 7)
 
         rook_white_1 = Rook("white", 0, 0)
@@ -91,7 +91,7 @@ class Board:
         self.white_king_pos = (0, 3)
         self.black_king_pos = (7, 3)
         self.captured_pieces = [["white"], ["black"]]
-        self.last_move = [None, None, None]
+        self.last_move = [4,7,"pawn","black"]
 
     @staticmethod
     def coordinates_to_index(coordinate):
@@ -126,6 +126,7 @@ class Board:
 
         if piece.piece_type == "pawn":
             self.pawn_diagonal(piece, list_of_moves)
+        self.en_passant(piece,list_of_moves,self.last_move)
 
         # check for moving into check
         moves_to_remove = []
@@ -133,7 +134,7 @@ class Board:
             self.chessBoard[current_position[0]][current_position[1]] = None
             temp = self.chessBoard[move[0]][move[1]]
             self.chessBoard[move[0]][move[1]] = piece
-            if self.is_check(piece.colour, list_of_moves):
+            if self.is_check(piece.colour):
                 moves_to_remove.append(move)
             self.chessBoard[current_position[0]][current_position[1]] = piece
             self.chessBoard[move[0]][move[1]] = temp
@@ -405,7 +406,7 @@ class Board:
                 self.capture_handler(self.chessBoard[row][col])
             piece_to_move.position = (row, col)
             self.chessBoard[row][col] = piece_to_move
-            self.last_move = [row, col, piece_to_move.piece_type]
+            self.last_move = [row, col, piece_to_move.piece_type,piece_to_move.colour]
 
     def add_castling(self, piece, list_of_moves):
         colour = piece.colour
@@ -528,14 +529,21 @@ class Board:
 
     #for en_passant need a last move i can store the last move made in list from the move fucntion getting executed then can
     #check the list to see last move made see if its all good then i can clear the list and add the last move into the list again
-    def en_passant(self,piece,list_of_moves,last_move,last_move_piece):
-        if piece==1:
-            pass
-            if piece.piece_type=="pawn" and last_move.position[0]==piece.position[0] and last_move_piece.piece=="pawn" and abs(last_move.position[1]-piece.position[1])==1:
-                if piece==2:
-                    pass
-
-
+    def en_passant(self, piece, list_of_moves, last_move):
+        self.last_move = last_move
+        if last_move == [None, None, None, None]:
+            return
+        last_row, last_col, last_piece_type, last_piece_colour = last_move
+        if piece.piece_type == "pawn" and last_piece_type == "pawn" and piece.colour != last_piece_colour:
+            if abs(last_row - piece.position[0]) == 2 and abs(last_col - piece.position[1]) == 1:
+                if piece.colour == "white":
+                    en_passant_row = piece.position[0] - 1
+                    en_passant_col = last_col  # The column where the opponent's pawn moved
+                else:
+                    en_passant_row = piece.position[0] + 1
+                    en_passant_col = last_col  # The column where the opponent's pawn moved
+                # Add the en passant move to the list of valid moves
+                list_of_moves.append((en_passant_row, en_passant_col))
 
     def list_of_moves_for_check(self,piece):
         list_of_moves = []
@@ -546,7 +554,7 @@ class Board:
         self.landing_on_own_piece(list_of_moves, piece)
         if piece.piece_type=="pawn":
             self.pawn_diagonal(piece,list_of_moves)
-            self.en_passant(piece,list_of_moves)
+        self.en_passant(piece,list_of_moves,self.last_move)
         return list_of_moves
 
     def castle_handler(self, row, col, piece):

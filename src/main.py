@@ -34,9 +34,9 @@ def place_pieces():
 
 
 
-current_position = (7,7)
+current_position = (4,6)
 valid_moves = gameBoard.valid_moves(current_position)
-possible_captures = gameBoard.possible_captures(valid_moves, gameBoard.chessBoard[7][7])
+possible_captures = gameBoard.possible_captures(valid_moves, gameBoard.chessBoard[4][6])
 
 
 draw_chessboard()

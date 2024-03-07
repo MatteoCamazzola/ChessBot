@@ -118,6 +118,8 @@ class Board:
         else:
             self.blocking_pieces(list_of_moves, piece)
         self.landing_on_own_piece(list_of_moves, piece)
+        if piece.piece_type == "rook" or piece.piece_type == "king":
+            self.add_castling(piece, list_of_moves)
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
@@ -292,13 +294,162 @@ class Board:
                 possible_captures.append((capture_row, capture_col))
         return possible_captures
 
-    def capture_handler(self, capturer, capturee):
-        pass
+    def capture_handler(self, capturee):
+        # remove capturee from the chess board
+        self.chessBoard[capturee.position[0]][capturee.position[1]] = None
+        # place the capturee in the captured pieces list
+        if capturee.colour == "white":
+            self.captured_pieces[0].append(capturee)
+        else:
+            self.captured_pieces[1].append(capturee)
 
     # assuming that the move is valid
+    # remember to update the king position in member variable
     def make_move(self, row, col, list_of_moves, piece_to_move):
+        if piece_to_move.piece_type == "king":
+            self.move_white_king(row, col)
         possible_captures = self.possible_captures(list_of_moves, piece_to_move)
         if (row, col) in possible_captures:
-            self.capture_handler(piece_to_move, self.chessBoard[row][col])
+            self.capture_handler(self.chessBoard[row][col])
+        piece_to_move.position = (row, col)
+
+    def add_castling(self, piece, list_of_moves):
+        colour = piece.colour
+        if colour == "white":
+            if piece.piece_type == "rook":
+                if self.did_not_move(piece, self.chessBoard[self.white_king_pos[0]][self.white_king_pos[1]]):
+                    if self.piece_in_between(piece):
+                        if not self.is_check(colour):
+                            if self.king_through_check(piece,
+                                                       self.chessBoard[self.white_king_pos[0]][self.white_king_pos[1]]):
+                                list_of_moves.append((0, 3))
+            else:
+                if not piece.has_moved:
+                    if self.chessBoard[0][0] != None:
+                        if self.chessBoard[0][0].piece_type == "rook":
+                            if not self.chessBoard[0][0].has_moved:
+                                if self.piece_in_between(self.chessBoard[0][0]):
+                                    if not self.is_check(colour):
+                                        if self.king_through_check(self.chessBoard[0][0], piece):
+                                            list_of_moves.append((0, 0))
+                    if self.chessBoard[0][7] != None:
+                        if self.chessBoard[0][7].piece_type == "rook":
+                            if not self.chessBoard[0][7].has_moved:
+                                if self.piece_in_between(self.chessBoard[0][7]):
+                                    if not self.is_check(colour):
+                                        if self.king_through_check(self.chessBoard[0][7], piece):
+                                            list_of_moves.append((0, 7))
+
+
         else:
+            if piece.piece_type == "rook":
+                if self.did_not_move(piece, self.chessBoard[self.black_king_pos[0]][self.black_king_pos[1]]):
+                    if self.piece_in_between(piece):
+                        if not self.is_check(colour):
+                            if self.king_through_check(piece,
+                                                       self.chessBoard[self.black_king_pos[0]][self.black_king_pos[1]]):
+                                list_of_moves.append((7, 3))
+            else:
+                if not piece.has_moved:
+                    if self.chessBoard[7][0] != None:
+                        if self.chessBoard[7][0].piece_type == "rook":
+                            if not self.chessBoard[7][0].has_moved:
+                                if self.piece_in_between(self.chessBoard[7][0]):
+                                    if not self.is_check(colour):
+                                        if self.king_through_check(self.chessBoard[7][0], piece):
+                                            list_of_moves.append((7, 0))
+                    if self.chessBoard[7][7] != None:
+                        if self.chessBoard[7][7].piece_type == "rook":
+                            if not self.chessBoard[7][7].has_moved:
+                                if self.piece_in_between(self.chessBoard[7][7]):
+                                    if not self.is_check(colour):
+                                        if self.king_through_check(self.chessBoard[7][7], piece):
+                                            list_of_moves.append((7, 7))
+
+    def did_not_move(self, piece_one, piece_two):
+        if (not piece_one.has_moved) and (not piece_two.has_moved):
+            return True
+        else:
+            return False
+
+    def piece_in_between(self, piece_one):
+        if piece_one.position[1] > 5:
+            if self.chessBoard[piece_one.position[0]][5] == None and self.chessBoard[piece_one.position[0]][
+                6] == None and self.chessBoard[piece_one.position[0][4]] == None:
+                return True
+            else:
+                return False
+        else:
+            if self.chessBoard[piece_one.position[0]][1] == None and self.chessBoard[piece_one.position[0]][
+                2] == None:
+                return True
+            else:
+                return False
             pass
+
+    def king_through_check(self, piece_one, piece_two):
+        colour = piece_two.colour
+
+        if colour == "white":
+            if piece_one.position[1] > 5:
+                self.track_white_king(piece_two.position[0], 4)
+                if self.is_check(piece_two.colour):
+                    self.track_white_king(piece_two.position[0], 3)
+                    return False
+                self.track_white_king(piece_two.position[0], 5)
+                if self.is_check(piece_two.colour):
+                    self.track_white_king(piece_two.position[0], 3)
+                    return False
+                self.track_white_king(piece_two.position[0], 6)
+                if self.is_check(piece_two.colour):
+                    self.track_white_king(piece_two.position[0], 3)
+                    return False
+                self.track_white_king(piece_two.position[0], 7)
+                if self.is_check(piece_two.colour):
+                    self.track_white_king(piece_two.position[0], 3)
+                    return False
+            else:
+                self.track_white_king(piece_two.position[0], 0)
+                if self.is_check(piece_two.colour):
+                    self.track_white_king(piece_two.position[0], 3)
+                    return False
+                self.track_white_king(piece_two.position[0], 1)
+                if self.is_check(piece_two.colour):
+                    self.track_white_king(piece_two.position[0], 3)
+                    return False
+                self.track_white_king(piece_two.position[0], 2)
+                if self.is_check(piece_two.colour):
+                    self.track_white_king(piece_two.position[0], 3)
+                    return False
+        else:
+            if piece_one.position[1] > 5:
+                self.track_black_king(piece_two.position[0], 4)
+                if self.is_check(piece_two.colour):
+                    self.track_black_king(piece_two.position[0], 3)
+                    return False
+                self.track_black_king(piece_two.position[0], 5)
+                if self.is_check(piece_two.colour):
+                    self.track_black_king(piece_two.position[0], 3)
+                    return False
+                self.track_black_king(piece_two.position[0], 6)
+                if self.is_check(piece_two.colour):
+                    self.track_black_king(piece_two.position[0], 3)
+                    return False
+                self.track_black_king(piece_two.position[0], 7)
+                if self.is_check(piece_two.colour):
+                    self.track_black_king(piece_two.position[0], 3)
+                    return False
+            else:
+                self.track_black_king(piece_two.position[0], 0)
+                if self.is_check(piece_two.colour):
+                    self.track_black_king(piece_two.position[0], 3)
+                    return False
+                self.track_black_king(piece_two.position[0], 1)
+                if self.is_check(piece_two.colour):
+                    self.track_black_king(piece_two.position[0], 3)
+                    return False
+                self.track_black_king(piece_two.position[0], 2)
+                if self.is_check(piece_two.colour):
+                    self.track_black_king(piece_two.position[0], 3)
+                    return False
+        return True

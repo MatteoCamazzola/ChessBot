@@ -225,10 +225,10 @@ class Board:
                     continue
                 elif piece.piece_type == "king" and piece.colour != colour:
                     continue
-                elif piece.colour != colour and piece.colour=="black":
+                elif piece.colour != colour and piece.colour == "black":
                     if self.white_king_pos in self.list_of_moves_for_check(piece):
                         return True
-                elif piece.colour != colour and piece.colour=="white":
+                elif piece.colour != colour and piece.colour == "white":
                     if self.black_king_pos in self.list_of_moves_for_check(piece):
                         return True
         return False
@@ -389,7 +389,7 @@ class Board:
     # assuming that the move is valid
     # remember to update the king position in member variable
     def make_move(self, row, col, list_of_moves, piece_to_move):
-        #handle castling
+        # handle castling
         if self.chessBoard[row][col] != None:
             if self.chessBoard[row][col].colour == piece_to_move.colour:
                 self.castle_handler(row, col, piece_to_move)
@@ -397,7 +397,10 @@ class Board:
 
         else:
             if piece_to_move.piece_type == "king":
-                self.move_white_king(row, col)
+                if piece_to_move.colour == "white":
+                    self.track_white_king(row, col)
+                else:
+                    self.track_black_king(row, col)
             if piece_to_move.piece_type == "king" or piece_to_move.piece_type == "rook":
                 piece_to_move.has_moved = True
             possible_captures = self.possible_captures(list_of_moves, piece_to_move)
@@ -525,22 +528,50 @@ class Board:
                     self.track_black_king(piece_two.position[0], 3)
                     return False
         return True
+
     def en_passant(self):
         pass
 
-    def list_of_moves_for_check(self,piece):
+    def list_of_moves_for_check(self, piece):
         list_of_moves = []
         if piece.piece_type == "knight" or piece.piece_type == "king" or piece.piece_type == "pawn":
             list_of_moves = piece.valid_move()
         else:
             self.blocking_pieces(list_of_moves, piece)
         self.landing_on_own_piece(list_of_moves, piece)
-        if piece.piece_type=="pawn":
-            self.pawn_diagonal(piece,list_of_moves)
+        if piece.piece_type == "pawn":
+            self.pawn_diagonal(piece, list_of_moves)
         return list_of_moves
 
     def castle_handler(self, row, col, piece):
-        if piece.piece_type == "king":
-            pass
+        if abs(piece.position[1] - col) == 3:
+            self.chessBoard[row][3].has_moved = True
+            self.chessBoard[row][3].position = (row, 1)
+            self.chessBoard[row][0].has_moved = True
+            self.chessBoard[row][0].position = (row, 2)
+
+            self.chessBoard[row][1] = self.chessBoard[row][3]
+            self.chessBoard[row][2] = self.chessBoard[row][0]
+            self.chessBoard[row][3] = None
+            self.chessBoard[row][0] = None
+
+            if piece.colour == "white":
+                self.white_king_pos = (0, 1)
+            else:
+                self.black_king_pos = (7, 1)
+
         else:
-            pass
+            self.chessBoard[row][3].has_moved = True
+            self.chessBoard[row][3].position = (row, 5)
+            self.chessBoard[row][7].has_moved = True
+            self.chessBoard[row][7].position = (row, 4)
+
+            self.chessBoard[row][5] = self.chessBoard[row][3]
+            self.chessBoard[row][4] = self.chessBoard[row][7]
+            self.chessBoard[row][3] = None
+            self.chessBoard[row][7] = None
+
+            if piece.colour == "white":
+                self.white_king_pos = (0, 5)
+            else:
+                self.black_king_pos = (7, 5)

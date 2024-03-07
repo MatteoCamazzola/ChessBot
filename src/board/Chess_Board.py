@@ -27,10 +27,10 @@ class Board:
         rook_black_1 = Rook("black", 7, 0)
         rook_black_2 = Rook("black", 7, 7)
         knight_black_1 = Knight("black", 7, 1)
-        knight_black_2 = Knight("black", 7, 6)
+        knight_black_2 = Knight("black", 3, 3)
         bishop_black_1 = Bishop("black", 7, 2)
-        bishop_black_2 = Bishop("black", 7, 5)
-        queen_black = Queen("black", 6, 3)
+        bishop_black_2 = Bishop("black", 6, 4)
+        queen_black = Queen("black", 4, 3)
         king_black = King("black", 7, 3)
 
         pawn_white_1 = Pawn("white", 1, 0)
@@ -48,7 +48,7 @@ class Board:
         knight_white_2 = Knight("white", 0, 6)
         bishop_white_1 = Bishop("white", 0, 5)
         bishop_white_2 = Bishop("white", 0, 2)
-        queen_white = Queen("white", 0, 4)
+        queen_white = Queen("white", 1, 3)
         king_white = King("white", 0, 3)
 
         # put pieces on board
@@ -216,7 +216,7 @@ class Board:
         self.black_king_pos = (new_row, new_col)
 
     # input black or white        #output true for check false for not in check
-    def is_check(self, colour, list_of_moves):
+    def is_check(self, colour):
         for x in range(8):
             for y in range(8):
                 piece = self.chessBoard[x][y]
@@ -403,10 +403,10 @@ class Board:
             if piece.piece_type == "rook":
                 if self.did_not_move(piece, self.chessBoard[self.white_king_pos[0]][self.white_king_pos[1]]):
                     if self.piece_in_between(piece):
-                        if not self.is_check(colour, list_of_moves):
+                        if not self.is_check(colour):
                             if self.king_through_check(piece,
-                                                       self.chessBoard[self.white_king_pos[0]][self.white_king_pos[1]],
-                                                       list_of_moves):
+                                                       self.chessBoard[self.white_king_pos[0]][self.white_king_pos[1]]
+                                                       ):
                                 list_of_moves.append((0, 3))
             else:
                 if not piece.has_moved:
@@ -414,15 +414,15 @@ class Board:
                         if self.chessBoard[0][0].piece_type == "rook":
                             if not self.chessBoard[0][0].has_moved:
                                 if self.piece_in_between(self.chessBoard[0][0]):
-                                    if not self.is_check(colour, list_of_moves):
-                                        if self.king_through_check(self.chessBoard[0][0], piece, list_of_moves):
+                                    if not self.is_check(colour):
+                                        if self.king_through_check(self.chessBoard[0][0], piece):
                                             list_of_moves.append((0, 0))
                     if self.chessBoard[0][7] != None:
                         if self.chessBoard[0][7].piece_type == "rook":
                             if not self.chessBoard[0][7].has_moved:
                                 if self.piece_in_between(self.chessBoard[0][7]):
-                                    if not self.is_check(colour, list_of_moves):
-                                        if self.king_through_check(self.chessBoard[0][7], piece, list_of_moves):
+                                    if not self.is_check(colour):
+                                        if self.king_through_check(self.chessBoard[0][7], piece):
                                             list_of_moves.append((0, 7))
 
 
@@ -430,10 +430,10 @@ class Board:
             if piece.piece_type == "rook":
                 if self.did_not_move(piece, self.chessBoard[self.black_king_pos[0]][self.black_king_pos[1]]):
                     if self.piece_in_between(piece):
-                        if not self.is_check(colour, list_of_moves):
+                        if not self.is_check(colour):
                             if self.king_through_check(piece,
-                                                       self.chessBoard[self.black_king_pos[0]][self.black_king_pos[1]],
-                                                       list_of_moves):
+                                                       self.chessBoard[self.black_king_pos[0]][self.black_king_pos[1]]
+                                                      ):
                                 list_of_moves.append((7, 3))
             else:
                 if not piece.has_moved:
@@ -441,15 +441,15 @@ class Board:
                         if self.chessBoard[7][0].piece_type == "rook":
                             if not self.chessBoard[7][0].has_moved:
                                 if self.piece_in_between(self.chessBoard[7][0]):
-                                    if not self.is_check(colour, list_of_moves):
-                                        if self.king_through_check(self.chessBoard[7][0], piece, list_of_moves):
+                                    if not self.is_check(colour):
+                                        if self.king_through_check(self.chessBoard[7][0], piece):
                                             list_of_moves.append((7, 0))
                     if self.chessBoard[7][7] != None:
                         if self.chessBoard[7][7].piece_type == "rook":
                             if not self.chessBoard[7][7].has_moved:
                                 if self.piece_in_between(self.chessBoard[7][7]):
-                                    if not self.is_check(colour, list_of_moves):
-                                        if self.king_through_check(self.chessBoard[7][7], piece, list_of_moves):
+                                    if not self.is_check(colour):
+                                        if self.king_through_check(self.chessBoard[7][7], piece):
                                             list_of_moves.append((7, 7))
 
     def did_not_move(self, piece_one, piece_two):
@@ -473,50 +473,59 @@ class Board:
                 return False
             pass
 
-    def king_through_check(self, piece_one, piece_two, list_of_moves):
+    def king_through_check(self, piece_one, piece_two):
         colour = piece_two.colour
 
         if colour == "white":
             if piece_one.position[1] > 5:
                 self.track_white_king(piece_two.position[0], 4)
-                if self.is_check(piece_two.colour, list_of_moves):
+                if self.is_check(piece_two.colour):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
                 self.track_white_king(piece_two.position[0], 5)
-                if self.is_check(piece_two.colour, list_of_moves):
+                if self.is_check(piece_two.colour):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
             else:
                 self.track_white_king(piece_two.position[0], 1)
-                if self.is_check(piece_two.colour, list_of_moves):
+                if self.is_check(piece_two.colour):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
                 self.track_white_king(piece_two.position[0], 2)
-                if self.is_check(piece_two.colour, list_of_moves):
+                if self.is_check(piece_two.colour):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
         else:
             if piece_one.position[1] > 5:
                 self.track_black_king(piece_two.position[0], 4)
-                if self.is_check(piece_two.colour, list_of_moves):
+                if self.is_check(piece_two.colour):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
                 self.track_black_king(piece_two.position[0], 5)
-                if self.is_check(piece_two.colour, list_of_moves):
+                if self.is_check(piece_two.colour):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
             else:
                 self.track_black_king(piece_two.position[0], 1)
-                if self.is_check(piece_two.colour, list_of_moves):
+                if self.is_check(piece_two.colour):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
                 self.track_black_king(piece_two.position[0], 2)
-                if self.is_check(piece_two.colour, list_of_moves):
+                if self.is_check(piece_two.colour):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
         return True
-    def en_passant(self):
-        pass
+
+    #for en_passant need a last move i can store the last move made in list from the move fucntion getting executed then can
+    #check the list to see last move made see if its all good then i can clear the list and add the last move into the list again
+    def en_passant(self,piece,list_of_moves,last_move,last_move_piece):
+        if piece==1:
+            pass
+            if piece.piece_type=="pawn" and last_move.position[0]==piece.position[0] and last_move_piece.piece=="pawn" and abs(last_move.position[1]-piece.position[1])==1:
+                if piece==2:
+                    pass
+
+
 
     def list_of_moves_for_check(self,piece):
         list_of_moves = []
@@ -527,5 +536,6 @@ class Board:
         self.landing_on_own_piece(list_of_moves, piece)
         if piece.piece_type=="pawn":
             self.pawn_diagonal(piece,list_of_moves)
+            self.en_passant(piece,list_of_moves)
         return list_of_moves
 

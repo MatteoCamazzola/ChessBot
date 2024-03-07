@@ -26,11 +26,11 @@ class Board:
 
         rook_black_1 = Rook("black", 7, 0)
         rook_black_2 = Rook("black", 7, 7)
-        knight_black_1 = Knight("black", 5, 1)
-        knight_black_2 = Knight("black", 5, 6)
-        bishop_black_1 = Bishop("black", 5, 2)
-        bishop_black_2 = Bishop("black", 5, 5)
-        queen_black = Queen("black", 5, 4)
+        knight_black_1 = Knight("black", 7, 1)
+        knight_black_2 = Knight("black", 7, 6)
+        bishop_black_1 = Bishop("black", 7, 2)
+        bishop_black_2 = Bishop("black", 7, 5)
+        queen_black = Queen("black", 7, 4)
         king_black = King("black", 7, 3)
 
         pawn_white_1 = Pawn("white", 1, 0)
@@ -46,8 +46,8 @@ class Board:
         rook_white_2 = Rook("white", 0, 7)
         knight_white_1 = Knight("white", 0, 1)
         knight_white_2 = Knight("white", 0, 6)
-        bishop_white_1 = Bishop("white", 0, 2)
-        bishop_white_2 = Bishop("white", 0, 5)
+        bishop_white_1 = Bishop("white", 0, 5)
+        bishop_white_2 = Bishop("white", 0, 2)
         queen_white = Queen("white", 0, 4)
         king_white = King("white", 0, 3)
 
@@ -123,23 +123,31 @@ class Board:
         if piece.piece_type == "rook" or piece.piece_type == "king":
             self.add_castling(piece, list_of_moves)
 
-        self.pawn_diagonal(piece,list_of_moves)
+        if piece.piece_type=="pawn":
+            self.pawn_diagonal(piece,list_of_moves)
 
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
-        for move in list_of_moves:
+        moves_to_remove = []  # Create a list to store moves to be removed
+        for move in list_of_moves[:]:  # Iterate over a copy of the list
             x, y = move
             other_piece = self.chessBoard[x][y]
 
             if other_piece is not None and piece.colour == other_piece.colour and piece.piece_type != "pawn":
-                list_of_moves.remove(move)
+                moves_to_remove.append(move)
+
             elif other_piece is not None and piece.piece_type == "pawn" and abs(
                     piece.position[0] - other_piece.position[0]) == 1:
-                list_of_moves.clear()
+                moves_to_remove.clear()
                 pass
+
             elif other_piece is not None and piece.piece_type == "pawn":
-                list_of_moves.remove(move)
+                moves_to_remove.append(move)
+
+        # Remove moves from the original list
+        for move in moves_to_remove:
+            list_of_moves.remove(move)
 
     def pawn_diagonal(self, piece, list_of_moves):
         row, col = piece.position[0], piece.position[1]
@@ -189,7 +197,7 @@ class Board:
         self.black_king_pos = (new_row, new_col)
 
 #input black or white        #output true for check false for not in check
-    def is_check(self,colour):
+    def is_check(self,colour,list_of_moves):
         self.white_king_pos
         self.black_king_pos
         for x in range(8):
@@ -200,11 +208,9 @@ class Board:
                 elif piece.piece_type=="king" and piece.colour!=colour:
                     continue
                 elif piece.colour != colour and piece.colour=="black":
-                    list_of_moves = self.valid_moves((x, y))
                     if self.white_king_pos in list_of_moves:
                         return True
                 elif piece.colour != colour and piece.colour=="white":
-                    list_of_moves = self.valid_moves((x, y))
                     if self.black_king_pos in list_of_moves:
                         return True
         return False
@@ -379,9 +385,9 @@ class Board:
             if piece.piece_type == "rook":
                 if self.did_not_move(piece, self.chessBoard[self.white_king_pos[0]][self.white_king_pos[1]]):
                     if self.piece_in_between(piece):
-                        if not self.is_check(colour):
+                        if not self.is_check(colour, list_of_moves):
                             if self.king_through_check(piece,
-                                                       self.chessBoard[self.white_king_pos[0]][self.white_king_pos[1]]):
+                                                       self.chessBoard[self.white_king_pos[0]][self.white_king_pos[1]], list_of_moves):
                                 list_of_moves.append((0, 3))
             else:
                 if not piece.has_moved:
@@ -389,15 +395,15 @@ class Board:
                         if self.chessBoard[0][0].piece_type == "rook":
                             if not self.chessBoard[0][0].has_moved:
                                 if self.piece_in_between(self.chessBoard[0][0]):
-                                    if not self.is_check(colour):
-                                        if self.king_through_check(self.chessBoard[0][0], piece):
+                                    if not self.is_check(colour, list_of_moves):
+                                        if self.king_through_check(self.chessBoard[0][0], piece, list_of_moves):
                                             list_of_moves.append((0, 0))
                     if self.chessBoard[0][7] != None:
                         if self.chessBoard[0][7].piece_type == "rook":
                             if not self.chessBoard[0][7].has_moved:
                                 if self.piece_in_between(self.chessBoard[0][7]):
-                                    if not self.is_check(colour):
-                                        if self.king_through_check(self.chessBoard[0][7], piece):
+                                    if not self.is_check(colour, list_of_moves):
+                                        if self.king_through_check(self.chessBoard[0][7], piece, list_of_moves):
                                             list_of_moves.append((0, 7))
 
 
@@ -405,9 +411,9 @@ class Board:
             if piece.piece_type == "rook":
                 if self.did_not_move(piece, self.chessBoard[self.black_king_pos[0]][self.black_king_pos[1]]):
                     if self.piece_in_between(piece):
-                        if not self.is_check(colour):
+                        if not self.is_check(colour, list_of_moves):
                             if self.king_through_check(piece,
-                                                       self.chessBoard[self.black_king_pos[0]][self.black_king_pos[1]]):
+                                                       self.chessBoard[self.black_king_pos[0]][self.black_king_pos[1]], list_of_moves):
                                 list_of_moves.append((7, 3))
             else:
                 if not piece.has_moved:
@@ -415,15 +421,15 @@ class Board:
                         if self.chessBoard[7][0].piece_type == "rook":
                             if not self.chessBoard[7][0].has_moved:
                                 if self.piece_in_between(self.chessBoard[7][0]):
-                                    if not self.is_check(colour):
-                                        if self.king_through_check(self.chessBoard[7][0], piece):
+                                    if not self.is_check(colour, list_of_moves):
+                                        if self.king_through_check(self.chessBoard[7][0], piece, list_of_moves):
                                             list_of_moves.append((7, 0))
                     if self.chessBoard[7][7] != None:
                         if self.chessBoard[7][7].piece_type == "rook":
                             if not self.chessBoard[7][7].has_moved:
                                 if self.piece_in_between(self.chessBoard[7][7]):
-                                    if not self.is_check(colour):
-                                        if self.king_through_check(self.chessBoard[7][7], piece):
+                                    if not self.is_check(colour, list_of_moves):
+                                        if self.king_through_check(self.chessBoard[7][7], piece, list_of_moves):
                                             list_of_moves.append((7, 7))
 
     def did_not_move(self, piece_one, piece_two):
@@ -447,69 +453,69 @@ class Board:
                 return False
             pass
 
-    def king_through_check(self, piece_one, piece_two):
+    def king_through_check(self, piece_one, piece_two, list_of_moves):
         colour = piece_two.colour
 
         if colour == "white":
             if piece_one.position[1] > 5:
                 self.track_white_king(piece_two.position[0], 4)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
                 self.track_white_king(piece_two.position[0], 5)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
                 self.track_white_king(piece_two.position[0], 6)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
                 self.track_white_king(piece_two.position[0], 7)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
             else:
                 self.track_white_king(piece_two.position[0], 0)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
                 self.track_white_king(piece_two.position[0], 1)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
                 self.track_white_king(piece_two.position[0], 2)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
         else:
             if piece_one.position[1] > 5:
                 self.track_black_king(piece_two.position[0], 4)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
                 self.track_black_king(piece_two.position[0], 5)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
                 self.track_black_king(piece_two.position[0], 6)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
                 self.track_black_king(piece_two.position[0], 7)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
             else:
                 self.track_black_king(piece_two.position[0], 0)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
                 self.track_black_king(piece_two.position[0], 1)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
                 self.track_black_king(piece_two.position[0], 2)
-                if self.is_check(piece_two.colour):
+                if self.is_check(piece_two.colour, list_of_moves):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
         return True

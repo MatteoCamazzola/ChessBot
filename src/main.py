@@ -37,7 +37,7 @@ move=(7,4)
 current_position = (7,7)
 valid_moves = gameBoard.valid_moves(current_position)
 possible_captures = gameBoard.possible_captures(valid_moves, gameBoard.chessBoard[current_position[0]][current_position[1]],gameBoard.last_move)
-if gameBoard.is_valid_move(move,valid_gmoves):
+if gameBoard.is_valid_move(move,valid_moves):
     gameBoard.make_move(move[0],move[1],valid_moves, gameBoard.chessBoard[current_position[0]][current_position[1]])
 
 

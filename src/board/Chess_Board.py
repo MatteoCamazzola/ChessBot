@@ -414,7 +414,8 @@ class Board:
                     self.capture_handler(self.chessBoard[row -1][col])
                    else:
                        self.capture_handler(self.chessBoard[row + 1][col])
-                self.capture_handler(self.chessBoard[row][col])
+                else:
+                    self.capture_handler(self.chessBoard[row][col])
             self.chessBoard[piece_to_move.position[0]][piece_to_move.position[1]] = None
             piece_to_move.position = (row, col)
             self.chessBoard[row][col] = piece_to_move

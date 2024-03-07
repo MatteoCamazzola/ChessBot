@@ -127,6 +127,18 @@ class Board:
         if piece.piece_type=="pawn":
             self.pawn_diagonal(piece,list_of_moves)
 
+       #check for moving into check
+        moves_to_remove = []
+        for move in list_of_moves:
+            self.chessBoard[current_position[0]][current_position[1]] = None
+            self.chessBoard[move[0]][move[1]] = piece
+            if self.is_check(piece.colour, list_of_moves):
+                moves_to_remove.append(move)
+
+        for move in moves_to_remove:
+            list_of_moves.remove(move)
+
+
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
@@ -472,19 +484,7 @@ class Board:
                 if self.is_check(piece_two.colour, list_of_moves):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
-                self.track_white_king(piece_two.position[0], 6)
-                if self.is_check(piece_two.colour, list_of_moves):
-                    self.track_white_king(piece_two.position[0], 3)
-                    return False
-                self.track_white_king(piece_two.position[0], 7)
-                if self.is_check(piece_two.colour, list_of_moves):
-                    self.track_white_king(piece_two.position[0], 3)
-                    return False
             else:
-                self.track_white_king(piece_two.position[0], 0)
-                if self.is_check(piece_two.colour, list_of_moves):
-                    self.track_white_king(piece_two.position[0], 3)
-                    return False
                 self.track_white_king(piece_two.position[0], 1)
                 if self.is_check(piece_two.colour, list_of_moves):
                     self.track_white_king(piece_two.position[0], 3)
@@ -503,19 +503,7 @@ class Board:
                 if self.is_check(piece_two.colour, list_of_moves):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
-                self.track_black_king(piece_two.position[0], 6)
-                if self.is_check(piece_two.colour, list_of_moves):
-                    self.track_black_king(piece_two.position[0], 3)
-                    return False
-                self.track_black_king(piece_two.position[0], 7)
-                if self.is_check(piece_two.colour, list_of_moves):
-                    self.track_black_king(piece_two.position[0], 3)
-                    return False
             else:
-                self.track_black_king(piece_two.position[0], 0)
-                if self.is_check(piece_two.colour, list_of_moves):
-                    self.track_black_king(piece_two.position[0], 3)
-                    return False
                 self.track_black_king(piece_two.position[0], 1)
                 if self.is_check(piece_two.colour, list_of_moves):
                     self.track_black_king(piece_two.position[0], 3)

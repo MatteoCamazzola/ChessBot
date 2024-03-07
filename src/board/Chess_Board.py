@@ -17,7 +17,7 @@ class Board:
 
         pawn_black_1 = Pawn("black", 6, 0)
         pawn_black_2 = Pawn("black", 6, 1)
-        pawn_black_3 = Pawn("black", 6, 2)
+        pawn_black_3 = Pawn("black", 1, 2)
         pawn_black_4 = Pawn("black", 6, 3)
         pawn_black_5 = Pawn("black", 6, 4)
         pawn_black_6 = Pawn("black", 6, 5)
@@ -30,12 +30,12 @@ class Board:
         knight_black_2 = Knight("black", 7, 6)
         bishop_black_1 = Bishop("black", 7, 2)
         bishop_black_2 = Bishop("black", 7, 5)
-        queen_black = Queen("black", 3, 3)
+        queen_black = Queen("black", 7, 4)
         king_black = King("black", 7, 3)
 
         pawn_white_1 = Pawn("white", 1, 0)
         pawn_white_2 = Pawn("white", 1, 1)
-        pawn_white_3 = Pawn("white", 1, 2)
+        pawn_white_3 = Pawn("white", 6, 2)
         pawn_white_4 = Pawn("white", 1, 3)
         pawn_white_5 = Pawn("white", 1, 4)
         pawn_white_6 = Pawn("white", 1, 5)
@@ -44,7 +44,7 @@ class Board:
 
         rook_white_1 = Rook("white", 0, 0)
         rook_white_2 = Rook("white", 0, 7)
-        knight_white_1 = Knight("white", 0, 1)
+        knight_white_1 = Knight("white", 0, 4)
         knight_white_2 = Knight("white", 0, 6)
         bishop_white_1 = Bishop("white", 0, 2)
         bishop_white_2 = Bishop("white", 0, 5)
@@ -88,7 +88,8 @@ class Board:
         self.chessBoard[pawn_black_7.position[0]][pawn_black_7.position[1]] = pawn_black_7
         self.chessBoard[pawn_black_8.position[0]][pawn_black_8.position[1]] = pawn_black_8
 
-        self.white_king_starting_pos = (0, 3)
+        self.white_king_pos = (0, 3)
+        self.black_king_pos = (7,3)
         self.captured_pieces = [["white"], ["black"]]
 
     @staticmethod
@@ -118,6 +119,7 @@ class Board:
         else:
             self.blocking_pieces(list_of_moves, piece)
         self.landing_on_own_piece(list_of_moves, piece)
+        self.pawn_diagonal(piece,list_of_moves)
         return list_of_moves
 
     def landing_on_own_piece(self, list_of_moves, piece):
@@ -134,6 +136,31 @@ class Board:
             elif other_piece is not None and piece.piece_type == "pawn":
                 list_of_moves.remove(move)
 
+    def pawn_diagonal(self, piece, list_of_moves):
+        row, col = piece.position[0], piece.position[1]
+        if piece.colour == "white":
+            other_piece_white_bigger = (row + 1, col + 1)
+            other_piece_white_smaller = (row + 1, col - 1)
+            if 0 <= other_piece_white_bigger[0] < 8 and 0 <= other_piece_white_bigger[1] < 8:
+                if self.chessBoard[other_piece_white_bigger[0]][other_piece_white_bigger[1]] is not None \
+                        and self.chessBoard[other_piece_white_bigger[0]][other_piece_white_bigger[1]].colour != piece.colour:
+                    list_of_moves.append(other_piece_white_bigger)
+            if 0 <= other_piece_white_smaller[0] < 8 and 0 <= other_piece_white_smaller[1] < 8:
+                if self.chessBoard[other_piece_white_smaller[0]][other_piece_white_smaller[1]] is not None \
+                        and self.chessBoard[other_piece_white_smaller[0]][other_piece_white_smaller[1]].colour != piece.colour:
+                    list_of_moves.append(other_piece_white_smaller)
+        if piece.colour == "black":
+            other_piece_black_bigger = (row - 1, col + 1)
+            other_piece_black_smaller = (row - 1, col - 1)
+            if 0 <= other_piece_black_bigger[0] < 8 and 0 <= other_piece_black_bigger[1] < 8:
+                if self.chessBoard[other_piece_black_bigger[0]][other_piece_black_bigger[1]] is not None \
+                        and self.chessBoard[other_piece_black_bigger[0]][other_piece_black_bigger[1]].colour != piece.colour:
+                    list_of_moves.append(other_piece_black_bigger)
+            if 0 <= other_piece_black_smaller[0] < 8 and 0 <= other_piece_black_smaller[1] < 8:
+                if self.chessBoard[other_piece_black_smaller[0]][other_piece_black_smaller[1]] is not None \
+                        and self.chessBoard[other_piece_black_smaller[0]][other_piece_black_smaller[1]].colour != piece.colour:
+                    list_of_moves.append(other_piece_black_smaller)
+
     def blocking_pieces(self, list_of_moves, piece):
         if piece.piece_type == "bishop":
             self.bishop_valid_moves(list_of_moves, piece)
@@ -148,11 +175,39 @@ class Board:
     def white_king_location(self):
         return self.white_king_pos
 
-    def move_white_king(self, new_row, new_col):
+    def track_white_king(self, new_row, new_col):
         self.white_king_pos = (new_row, new_col)
 
-    def is_check(self):
+    def black_king_location(self):
+        return self.black_king_pos
+    def track_black_king(self, new_row, new_col):
+        self.black_king_pos = (new_row, new_col)
+
+#input black or white        #output true for check false for not in check
+    def is_check(self,colour):
         self.white_king_pos
+        self.black_king_pos
+        for x in range(8):
+            for y in range(8):
+                piece = self.chessBoard[x][y]
+                if piece is None:
+                    continue
+                elif piece.piece_type=="king" and piece.colour!=colour:
+                    continue
+                elif piece.colour != colour and piece.colour=="black":
+                    list_of_moves = self.valid_moves((x, y))
+                    if self.white_king_pos in list_of_moves:
+                        return True
+                elif piece.colour != colour and piece.colour=="white":
+                    list_of_moves = self.valid_moves((x, y))
+                    if self.black_king_pos in list_of_moves:
+                        return True
+        return False
+
+
+
+
+
 
     def is_valid_move(self, row, col, valid_moves):
         if (row, col) in valid_moves:
@@ -290,6 +345,12 @@ class Board:
                 capture_row = other_piece.position[0]
                 capture_col = other_piece.position[1]
                 possible_captures.append((capture_row, capture_col))
+            elif piece.piece_type == "pawn" and other_piece is not None and piece.colour != other_piece.colour:
+                if abs(x - piece.position[0]) == 1 and abs(y - piece.position[1]) == 1:
+                    capture_row = other_piece.position[0]
+                    capture_col = other_piece.position[1]
+                    possible_captures.append((capture_row, capture_col))
+
         return possible_captures
 
     def capture_handler(self, capturer, capturee):

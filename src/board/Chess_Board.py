@@ -89,7 +89,7 @@ class Board:
         self.chessBoard[pawn_black_8.position[0]][pawn_black_8.position[1]] = pawn_black_8
 
         self.white_king_pos = (0, 3)
-        self.black_king_pos = (7,3)
+        self.black_king_pos = (7, 3)
         self.captured_pieces = [["white"], ["black"]]
 
     @staticmethod
@@ -123,7 +123,7 @@ class Board:
         if piece.piece_type == "rook" or piece.piece_type == "king":
             self.add_castling(piece, list_of_moves)
 
-        self.pawn_diagonal(piece,list_of_moves)
+        self.pawn_diagonal(piece, list_of_moves)
 
         return list_of_moves
 
@@ -148,22 +148,26 @@ class Board:
             other_piece_white_smaller = (row + 1, col - 1)
             if 0 <= other_piece_white_bigger[0] < 8 and 0 <= other_piece_white_bigger[1] < 8:
                 if self.chessBoard[other_piece_white_bigger[0]][other_piece_white_bigger[1]] is not None \
-                        and self.chessBoard[other_piece_white_bigger[0]][other_piece_white_bigger[1]].colour != piece.colour:
+                        and self.chessBoard[other_piece_white_bigger[0]][
+                    other_piece_white_bigger[1]].colour != piece.colour:
                     list_of_moves.append(other_piece_white_bigger)
             if 0 <= other_piece_white_smaller[0] < 8 and 0 <= other_piece_white_smaller[1] < 8:
                 if self.chessBoard[other_piece_white_smaller[0]][other_piece_white_smaller[1]] is not None \
-                        and self.chessBoard[other_piece_white_smaller[0]][other_piece_white_smaller[1]].colour != piece.colour:
+                        and self.chessBoard[other_piece_white_smaller[0]][
+                    other_piece_white_smaller[1]].colour != piece.colour:
                     list_of_moves.append(other_piece_white_smaller)
         if piece.colour == "black":
             other_piece_black_bigger = (row - 1, col + 1)
             other_piece_black_smaller = (row - 1, col - 1)
             if 0 <= other_piece_black_bigger[0] < 8 and 0 <= other_piece_black_bigger[1] < 8:
                 if self.chessBoard[other_piece_black_bigger[0]][other_piece_black_bigger[1]] is not None \
-                        and self.chessBoard[other_piece_black_bigger[0]][other_piece_black_bigger[1]].colour != piece.colour:
+                        and self.chessBoard[other_piece_black_bigger[0]][
+                    other_piece_black_bigger[1]].colour != piece.colour:
                     list_of_moves.append(other_piece_black_bigger)
             if 0 <= other_piece_black_smaller[0] < 8 and 0 <= other_piece_black_smaller[1] < 8:
                 if self.chessBoard[other_piece_black_smaller[0]][other_piece_black_smaller[1]] is not None \
-                        and self.chessBoard[other_piece_black_smaller[0]][other_piece_black_smaller[1]].colour != piece.colour:
+                        and self.chessBoard[other_piece_black_smaller[0]][
+                    other_piece_black_smaller[1]].colour != piece.colour:
                     list_of_moves.append(other_piece_black_smaller)
 
     def blocking_pieces(self, list_of_moves, piece):
@@ -188,8 +192,8 @@ class Board:
     def track_black_king(self, new_row, new_col):
         self.black_king_pos = (new_row, new_col)
 
-#input black or white        #output true for check false for not in check
-    def is_check(self,colour):
+    # input black or white        #output true for check false for not in check
+    def is_check(self, colour):
         self.white_king_pos
         self.black_king_pos
         for x in range(8):
@@ -197,18 +201,17 @@ class Board:
                 piece = self.chessBoard[x][y]
                 if piece is None:
                     continue
-                elif piece.piece_type=="king" and piece.colour!=colour:
+                elif piece.piece_type == "king" and piece.colour != colour:
                     continue
-                elif piece.colour != colour and piece.colour=="black":
+                elif piece.colour != colour and piece.colour == "black":
                     list_of_moves = self.valid_moves((x, y))
                     if self.white_king_pos in list_of_moves:
                         return True
-                elif piece.colour != colour and piece.colour=="white":
+                elif piece.colour != colour and piece.colour == "white":
                     list_of_moves = self.valid_moves((x, y))
                     if self.black_king_pos in list_of_moves:
                         return True
         return False
-
 
     def is_valid_move(self, row, col, valid_moves):
         if (row, col) in valid_moves:
@@ -368,6 +371,8 @@ class Board:
     def make_move(self, row, col, list_of_moves, piece_to_move):
         if piece_to_move.piece_type == "king":
             self.move_white_king(row, col)
+        if piece_to_move.piece_type == "king" or piece_to_move.piece_type == "rook":
+            piece_to_move.has_moved = True
         possible_captures = self.possible_captures(list_of_moves, piece_to_move)
         if (row, col) in possible_captures:
             self.capture_handler(self.chessBoard[row][col])

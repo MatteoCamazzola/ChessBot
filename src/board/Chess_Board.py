@@ -361,7 +361,7 @@ class Board:
         self.rook_valid_moves(valid_moves, piece)
         self.bishop_valid_moves(valid_moves, piece)
 
-    def possible_captures(self, list_of_moves, piece):
+    def possible_captures(self, list_of_moves, piece,last_move):
         possible_captures = []
         for move in list_of_moves:
             x, y = move
@@ -375,7 +375,8 @@ class Board:
                     capture_row = other_piece.position[0]
                     capture_col = other_piece.position[1]
                     possible_captures.append((capture_row, capture_col))
-
+            self.last_move = last_move
+        self.en_passant(piece,possible_captures,self.last_move)
         return possible_captures
 
     def capture_handler(self, capturee):
@@ -394,7 +395,7 @@ class Board:
         if self.chessBoard[row][col] != None:
             if self.chessBoard[row][col].colour == piece_to_move.colour:
                 self.castle_handler(row, col, piece_to_move)
-                self.last_move = [None, None, None]
+                self.last_move = [None, None,None,None]
 
         else:
             if piece_to_move.piece_type == "king":
@@ -538,12 +539,12 @@ class Board:
             return
         last_row, last_col, last_piece_type, last_piece_colour = last_move
         if piece.piece_type == "pawn" and last_piece_type == "pawn" and piece.colour != last_piece_colour:
-            if abs(last_row - piece.position[0]) == 2 and abs(last_col - piece.position[1]) == 1:
+            if abs(last_row - piece.position[0]) == 0 and abs(last_col - piece.position[1]) == 1:
                 if piece.colour == "white":
-                    en_passant_row = piece.position[0] - 1
+                    en_passant_row = piece.position[0] + 1
                     en_passant_col = last_col  # The column where the opponent's pawn moved
                 else:
-                    en_passant_row = piece.position[0] + 1
+                    en_passant_row = piece.position[0] - 1
                     en_passant_col = last_col  # The column where the opponent's pawn moved
                 # Add the en passant move to the list of valid moves
                 list_of_moves.append((en_passant_row, en_passant_col))

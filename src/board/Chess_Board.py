@@ -407,7 +407,7 @@ class Board:
                     self.track_black_king(row, col)
             if piece_to_move.piece_type == "king" or piece_to_move.piece_type == "rook":
                 piece_to_move.has_moved = True
-            possible_captures = self.possible_captures(list_of_moves, piece_to_move)
+            possible_captures = self.possible_captures(list_of_moves, piece_to_move,self.last_move)
             if (row, col) in possible_captures:
                 if self.chessBoard[row][col] == None:
                    if piece_to_move.colour == "white":

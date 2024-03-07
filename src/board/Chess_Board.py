@@ -91,7 +91,7 @@ class Board:
         self.white_king_pos = (0, 3)
         self.black_king_pos = (7, 3)
         self.captured_pieces = [["white"], ["black"]]
-        self.last_move = [4,7,"pawn","black"]
+        self.last_move = [None,None,None,None]
 
     @staticmethod
     def coordinates_to_index(coordinate):

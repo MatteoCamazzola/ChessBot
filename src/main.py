@@ -33,10 +33,12 @@ def place_pieces():
                                     anchor="center")
 
 
-
+move=(0,0)
 current_position = (4,6)
 valid_moves = gameBoard.valid_moves(current_position)
-possible_captures = gameBoard.possible_captures(valid_moves, gameBoard.chessBoard[4][6],gameBoard.last_move)
+possible_captures = gameBoard.possible_captures(valid_moves, gameBoard.chessBoard[current_position[0]][current_position[1]],gameBoard.last_move)
+if gameBoard.is_valid_move(move,valid_moves):
+    gameBoard.make_move(move[0],move[1],valid_moves, gameBoard.chessBoard[[current_position[0]]][current_position[1]])
 
 
 draw_chessboard()

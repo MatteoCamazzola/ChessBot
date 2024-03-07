@@ -394,10 +394,33 @@ class Board:
     # remember to update the king position in member variable
     def make_move(self, row, col, list_of_moves, piece_to_move):
         # handle castling
+
         if self.chessBoard[row][col] != None:
             if self.chessBoard[row][col].colour == piece_to_move.colour:
-                self.castle_handler(row, col, piece_to_move)
-                self.last_move = [None, None,None,None]
+                    self.castle_handler(row, col, piece_to_move)
+                    self.last_move = [None, None,None,None]
+
+            else:
+                if piece_to_move.piece_type == "king":
+                    if piece_to_move.colour == "white":
+                        self.track_white_king(row, col)
+                    else:
+                        self.track_black_king(row, col)
+                if piece_to_move.piece_type == "king" or piece_to_move.piece_type == "rook":
+                    piece_to_move.has_moved = True
+                possible_captures = self.possible_captures(list_of_moves, piece_to_move,self.last_move)
+                if (row, col) in possible_captures:
+                    if self.chessBoard[row][col] == None:
+                       if piece_to_move.colour == "white":
+                        self.capture_handler(self.chessBoard[row -1][col])
+                       else:
+                           self.capture_handler(self.chessBoard[row + 1][col])
+                    else:
+                        self.capture_handler(self.chessBoard[row][col])
+                self.chessBoard[piece_to_move.position[0]][piece_to_move.position[1]] = None
+                piece_to_move.position = (row, col)
+                self.chessBoard[row][col] = piece_to_move
+                self.last_move = [row, col, piece_to_move.piece_type,piece_to_move.colour]
 
         else:
             if piece_to_move.piece_type == "king":
@@ -407,19 +430,19 @@ class Board:
                     self.track_black_king(row, col)
             if piece_to_move.piece_type == "king" or piece_to_move.piece_type == "rook":
                 piece_to_move.has_moved = True
-            possible_captures = self.possible_captures(list_of_moves, piece_to_move,self.last_move)
+            possible_captures = self.possible_captures(list_of_moves, piece_to_move, self.last_move)
             if (row, col) in possible_captures:
                 if self.chessBoard[row][col] == None:
-                   if piece_to_move.colour == "white":
-                    self.capture_handler(self.chessBoard[row -1][col])
-                   else:
-                       self.capture_handler(self.chessBoard[row + 1][col])
+                    if piece_to_move.colour == "white":
+                        self.capture_handler(self.chessBoard[row - 1][col])
+                    else:
+                        self.capture_handler(self.chessBoard[row + 1][col])
                 else:
                     self.capture_handler(self.chessBoard[row][col])
             self.chessBoard[piece_to_move.position[0]][piece_to_move.position[1]] = None
             piece_to_move.position = (row, col)
             self.chessBoard[row][col] = piece_to_move
-            self.last_move = [row, col, piece_to_move.piece_type,piece_to_move.colour]
+            self.last_move = [row, col, piece_to_move.piece_type, piece_to_move.colour]
 
     def add_castling(self, piece, list_of_moves):
         colour = piece.colour

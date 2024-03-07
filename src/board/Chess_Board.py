@@ -22,7 +22,7 @@ class Board:
         pawn_black_5 = Pawn("black", 5, 1)
         pawn_black_6 = Pawn("black", 6, 5)
         pawn_black_7 = Pawn("black", 6, 6)
-        pawn_black_8 = Pawn("black", 6, 7)
+        pawn_black_8 = Pawn("black", 4, 7)
 
         rook_black_1 = Rook("black", 7, 0)
         rook_black_2 = Rook("black", 7, 7)
@@ -31,7 +31,7 @@ class Board:
         bishop_black_1 = Bishop("black", 5, 2)
         bishop_black_2 = Bishop("black", 6, 4)
         queen_black = Queen("black", 4, 3)
-        king_black = King("black", 7, 3)
+        king_black = King("black", 6, 7)
 
         pawn_white_1 = Pawn("white", 1, 0)
         pawn_white_2 = Pawn("white", 1, 1)
@@ -39,7 +39,7 @@ class Board:
         pawn_white_4 = Pawn("white", 2, 0)
         pawn_white_5 = Pawn("white", 2, 1)
         pawn_white_6 = Pawn("white", 1, 5)
-        pawn_white_7 = Pawn("white", 4, 6)
+        pawn_white_7 = Pawn("white", 4, 5)
         pawn_white_8 = Pawn("white", 1, 7)
 
         rook_white_1 = Rook("white", 0, 0)
@@ -89,7 +89,7 @@ class Board:
         self.chessBoard[pawn_black_8.position[0]][pawn_black_8.position[1]] = pawn_black_8
 
         self.white_king_pos = (0, 3)
-        self.black_king_pos = (7, 3)
+        self.black_king_pos = (6, 7)
         self.captured_pieces = [["white"], ["black"]]
         self.last_move = [None,None,None,None]
 
@@ -414,7 +414,8 @@ class Board:
                     self.capture_handler(self.chessBoard[row -1][col])
                    else:
                        self.capture_handler(self.chessBoard[row + 1][col])
-                self.capture_handler(self.chessBoard[row][col])
+                else:
+                    self.capture_handler(self.chessBoard[row][col])
             self.chessBoard[piece_to_move.position[0]][piece_to_move.position[1]] = None
             piece_to_move.position = (row, col)
             self.chessBoard[row][col] = piece_to_move

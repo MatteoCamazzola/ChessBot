@@ -18,7 +18,7 @@ class Board:
         pawn_black_1 = Pawn("black", 6, 0)
         pawn_black_2 = Pawn("black", 6, 1)
         pawn_black_3 = Pawn("black", 6, 2)
-        pawn_black_4 = Pawn("black", 6, 3)
+        pawn_black_4 = Pawn("black", 5, 7)
         pawn_black_5 = Pawn("black", 6, 4)
         pawn_black_6 = Pawn("black", 6, 5)
         pawn_black_7 = Pawn("black", 6, 6)
@@ -30,13 +30,13 @@ class Board:
         knight_black_2 = Knight("black", 7, 6)
         bishop_black_1 = Bishop("black", 7, 2)
         bishop_black_2 = Bishop("black", 7, 5)
-        queen_black = Queen("black", 7, 4)
+        queen_black = Queen("black", 6, 3)
         king_black = King("black", 7, 3)
 
         pawn_white_1 = Pawn("white", 1, 0)
         pawn_white_2 = Pawn("white", 1, 1)
         pawn_white_3 = Pawn("white", 1, 2)
-        pawn_white_4 = Pawn("white", 1, 3)
+        pawn_white_4 = Pawn("white", 3, 7)
         pawn_white_5 = Pawn("white", 1, 4)
         pawn_white_6 = Pawn("white", 1, 5)
         pawn_white_7 = Pawn("white", 1, 6)
@@ -225,10 +225,10 @@ class Board:
                     continue
 
                 elif piece.colour != colour and piece.colour=="black":
-                    if self.white_king_pos in list_of_moves:
+                    if self.white_king_pos in self.list_of_moves_for_check(piece):
                         return True
                 elif piece.colour != colour and piece.colour=="white":
-                    if self.black_king_pos in list_of_moves:
+                    if self.black_king_pos in self.list_of_moves_for_check(piece):
                         return True
         return False
 
@@ -513,4 +513,17 @@ class Board:
                     self.track_black_king(piece_two.position[0], 3)
                     return False
         return True
-    def en_pqssant
+    def en_passant(self):
+        pass
+
+    def list_of_moves_for_check(self,piece):
+        list_of_moves = []
+        if piece.piece_type == "knight" or piece.piece_type == "king" or piece.piece_type == "pawn":
+            list_of_moves = piece.valid_move()
+        else:
+            self.blocking_pieces(list_of_moves, piece)
+        self.landing_on_own_piece(list_of_moves, piece)
+        if piece.piece_type=="pawn":
+            self.pawn_diagonal(piece,list_of_moves)
+        return list_of_moves
+

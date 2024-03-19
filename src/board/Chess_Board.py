@@ -170,7 +170,7 @@ class Board:
 
             elif other_piece is not None and piece.piece_type == "pawn" and abs(
                     piece.position[0] - other_piece.position[0]) == 1:
-                moves_to_remove.clear()
+                moves_to_remove.append(move)
                 pass
 
             elif other_piece is not None and piece.piece_type == "pawn":

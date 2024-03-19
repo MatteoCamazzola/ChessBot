@@ -30,7 +30,7 @@ class Board:
         knight_black_2 = Knight("black", 3, 3)
         bishop_black_1 = Bishop("black", 7, 2)
         bishop_black_2 = Bishop("black", 6, 4)
-        queen_black = Queen("black", 4, 3)
+        queen_black = Queen("black", 1, 4)
         king_black = King("black", 7, 3)
 
         pawn_white_1 = Pawn("white", 1, 0)
@@ -91,7 +91,7 @@ class Board:
         self.white_king_pos = (0, 3)
         self.black_king_pos = (7, 3)
         self.captured_pieces = [["white"], ["black"]]
-        self.last_move = [None,None,None,None]
+        self.last_move = [None, None, None, None]
 
     @staticmethod
     def coordinates_to_index(coordinate):
@@ -126,18 +126,33 @@ class Board:
 
         if piece.piece_type == "pawn":
             self.pawn_diagonal(piece, list_of_moves)
-        self.en_passant(piece,list_of_moves,self.last_move)
+        self.en_passant(piece, list_of_moves, self.last_move)
 
         # check for moving into check
         moves_to_remove = []
         for move in list_of_moves:
-            self.chessBoard[current_position[0]][current_position[1]] = None
-            temp = self.chessBoard[move[0]][move[1]]
-            self.chessBoard[move[0]][move[1]] = piece
-            if self.is_check(piece.colour):
-                moves_to_remove.append(move)
-            self.chessBoard[current_position[0]][current_position[1]] = piece
-            self.chessBoard[move[0]][move[1]] = temp
+            if piece.piece_type != "king":
+                self.chessBoard[current_position[0]][current_position[1]] = None
+                temp = self.chessBoard[move[0]][move[1]]
+                self.chessBoard[move[0]][move[1]] = piece
+                if self.is_check(piece.colour):
+                    moves_to_remove.append(move)
+                self.chessBoard[current_position[0]][current_position[1]] = piece
+                self.chessBoard[move[0]][move[1]] = temp
+            else:
+                if piece.colour == "black":
+                    temp = self.black_king_pos
+                    self.black_king_pos = move
+                    if self.is_check(piece.colour):
+                        moves_to_remove.append(move)
+                    self.black_king_pos = temp
+                else:
+                    temp = self.white_king_pos
+                    self.white_king_pos = move
+                    if self.is_check(piece.colour):
+                        moves_to_remove.append(move)
+                    self.white_king_pos = temp
+
 
         for move in moves_to_remove:
             list_of_moves.remove(move)
@@ -234,7 +249,8 @@ class Board:
                         return True
         return False
 
-    def is_valid_move(self, move, valid_moves):
+    def is_valid_move(self, move, piece):
+        valid_moves = self.valid_moves((piece.position[0], piece.position[1]))
         if move in valid_moves:
             return True
         else:
@@ -363,7 +379,7 @@ class Board:
         self.rook_valid_moves(valid_moves, piece)
         self.bishop_valid_moves(valid_moves, piece)
 
-    def possible_captures(self, list_of_moves, piece,last_move):
+    def possible_captures(self, list_of_moves, piece, last_move):
         possible_captures = []
         for move in list_of_moves:
             x, y = move
@@ -378,7 +394,7 @@ class Board:
                     capture_col = other_piece.position[1]
                     possible_captures.append((capture_row, capture_col))
             self.last_move = last_move
-        self.en_passant(piece,possible_captures,self.last_move)
+        self.en_passant(piece, possible_captures, self.last_move)
         return possible_captures
 
     def capture_handler(self, capturee):
@@ -397,8 +413,8 @@ class Board:
 
         if self.chessBoard[row][col] != None:
             if self.chessBoard[row][col].colour == piece_to_move.colour:
-                    self.castle_handler(row, col, piece_to_move)
-                    self.last_move = [None, None,None,None]
+                self.castle_handler(row, col, piece_to_move)
+                self.last_move = [None, None, None, None]
 
             else:
                 if piece_to_move.piece_type == "king":
@@ -408,19 +424,19 @@ class Board:
                         self.track_black_king(row, col)
                 if piece_to_move.piece_type == "king" or piece_to_move.piece_type == "rook":
                     piece_to_move.has_moved = True
-                possible_captures = self.possible_captures(list_of_moves, piece_to_move,self.last_move)
+                possible_captures = self.possible_captures(list_of_moves, piece_to_move, self.last_move)
                 if (row, col) in possible_captures:
                     if self.chessBoard[row][col] == None:
-                       if piece_to_move.colour == "white":
-                        self.capture_handler(self.chessBoard[row -1][col])
-                       else:
-                           self.capture_handler(self.chessBoard[row + 1][col])
+                        if piece_to_move.colour == "white":
+                            self.capture_handler(self.chessBoard[row - 1][col])
+                        else:
+                            self.capture_handler(self.chessBoard[row + 1][col])
                     else:
                         self.capture_handler(self.chessBoard[row][col])
                 self.chessBoard[piece_to_move.position[0]][piece_to_move.position[1]] = None
                 piece_to_move.position = (row, col)
                 self.chessBoard[row][col] = piece_to_move
-                self.last_move = [row, col, piece_to_move.piece_type,piece_to_move.colour]
+                self.last_move = [row, col, piece_to_move.piece_type, piece_to_move.colour]
 
         else:
             if piece_to_move.piece_type == "king":
@@ -480,7 +496,7 @@ class Board:
                         if not self.is_check(colour):
                             if self.king_through_check(piece,
                                                        self.chessBoard[self.black_king_pos[0]][self.black_king_pos[1]]
-                                                      ):
+                                                       ):
                                 list_of_moves.append((7, 3))
             else:
                 if not piece.has_moved:
@@ -563,8 +579,8 @@ class Board:
                     return False
         return True
 
-    #for en_passant need a last move i can store the last move made in list from the move fucntion getting executed then can
-    #check the list to see last move made see if its all good then i can clear the list and add the last move into the list again
+    # for en_passant need a last move i can store the last move made in list from the move fucntion getting executed then can
+    # check the list to see last move made see if its all good then i can clear the list and add the last move into the list again
     def en_passant(self, piece, list_of_moves, last_move):
         self.last_move = last_move
         if last_move == [None, None, None, None]:
@@ -589,9 +605,9 @@ class Board:
             self.blocking_pieces(list_of_moves, piece)
         self.landing_on_own_piece(list_of_moves, piece)
 
-        if piece.piece_type=="pawn":
-            self.pawn_diagonal(piece,list_of_moves)
-        self.en_passant(piece,list_of_moves,self.last_move)
+        if piece.piece_type == "pawn":
+            self.pawn_diagonal(piece, list_of_moves)
+        self.en_passant(piece, list_of_moves, self.last_move)
         return list_of_moves
 
     def castle_handler(self, row, col, piece):

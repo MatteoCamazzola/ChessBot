@@ -15,7 +15,7 @@ class Board:
 
         # make all our pieces
 
-        pawn_black_1 = Pawn("black", 6, 0)
+        pawn_black_1 = Pawn("black", 4, 0)
         pawn_black_2 = Pawn("black", 6, 1)
         pawn_black_3 = Pawn("black", 6, 2)
         pawn_black_4 = Pawn("black", 6, 3)
@@ -35,7 +35,7 @@ class Board:
         king_black = King("black", 7, 3)
 
 
-        pawn_white_1 = Pawn("white", 1, 0)
+        pawn_white_1 = Pawn("white", 3, 0)
         pawn_white_2 = Pawn("white", 1, 1)
         pawn_white_3 = Pawn("white", 1, 2)
         pawn_white_4 = Pawn("white", 1, 3)

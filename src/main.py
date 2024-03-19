@@ -38,7 +38,6 @@ def place_pieces():
                                     anchor="center", tags="piece")
 
 
-
 def on_canvas_click(event):
     global selected_piece
     global current_player

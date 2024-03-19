@@ -26,31 +26,31 @@ class Board:
 
         rook_black_1 = Rook("black", 7, 0)
         rook_black_2 = Rook("black", 7, 7)
-        knight_black_1 = Knight("black", 4, 1)
+        knight_black_1 = Knight("black", 7, 1)
         knight_black_2 = Knight("black", 7, 6)
-        bishop_black_1 = Bishop("black", 5, 2)
-        bishop_black_2 = Bishop("black", 6, 4)
+        bishop_black_1 = Bishop("black", 7, 2)
+        bishop_black_2 = Bishop("black", 7, 5)
 
-        queen_black = Queen("black", 1, 4)
+        queen_black = Queen("black", 7, 4)
         king_black = King("black", 7, 3)
 
 
         pawn_white_1 = Pawn("white", 1, 0)
         pawn_white_2 = Pawn("white", 1, 1)
         pawn_white_3 = Pawn("white", 1, 2)
-        pawn_white_4 = Pawn("white", 2, 0)
-        pawn_white_5 = Pawn("white", 2, 1)
-        pawn_white_6 = Pawn("white", 2, 5)
-        pawn_white_7 = Pawn("white", 4, 5)
+        pawn_white_4 = Pawn("white", 1, 3)
+        pawn_white_5 = Pawn("white", 1, 4)
+        pawn_white_6 = Pawn("white", 1, 5)
+        pawn_white_7 = Pawn("white", 1, 6)
         pawn_white_8 = Pawn("white", 1, 7)
 
         rook_white_1 = Rook("white", 0, 0)
         rook_white_2 = Rook("white", 0, 7)
-        knight_white_1 = Knight("white", 0, 1)
-        knight_white_2 = Knight("white", 0, 6)
-        bishop_white_1 = Bishop("white", 0, 5)
-        bishop_white_2 = Bishop("white", 0, 2)
-        queen_white = Queen("white", 1, 3)
+        knight_white_1 = Knight("white", 2, 1)
+        knight_white_2 = Knight("white", 2, 6)
+        bishop_white_1 = Bishop("white", 2, 5)
+        bishop_white_2 = Bishop("white", 2, 2)
+        queen_white = Queen("white", 2, 4)
         king_white = King("white", 0, 3)
 
         # put pieces on board
@@ -549,6 +549,7 @@ class Board:
                 if self.is_check(piece_two.colour):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
+                self.white_king_pos = (0, 3)
             else:
                 self.track_white_king(piece_two.position[0], 1)
                 if self.is_check(piece_two.colour):
@@ -558,6 +559,7 @@ class Board:
                 if self.is_check(piece_two.colour):
                     self.track_white_king(piece_two.position[0], 3)
                     return False
+                self.white_king_pos = (0, 3)
         else:
             if piece_one.position[1] > 5:
                 self.track_black_king(piece_two.position[0], 4)
@@ -568,6 +570,7 @@ class Board:
                 if self.is_check(piece_two.colour):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
+                self.black_king_pos = (7 ,3)
             else:
                 self.track_black_king(piece_two.position[0], 1)
                 if self.is_check(piece_two.colour):
@@ -577,6 +580,7 @@ class Board:
                 if self.is_check(piece_two.colour):
                     self.track_black_king(piece_two.position[0], 3)
                     return False
+                self.black_king_pos = (7, 3)
         return True
 
     # for en_passant need a last move i can store the last move made in list from the move fucntion getting executed

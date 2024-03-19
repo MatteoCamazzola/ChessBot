@@ -90,8 +90,8 @@ class Board:
         self.chessBoard[pawn_black_7.position[0]][pawn_black_7.position[1]] = pawn_black_7
         self.chessBoard[pawn_black_8.position[0]][pawn_black_8.position[1]] = pawn_black_8
 
-        self.white_king_pos = (0, 3)
-        self.black_king_pos = (4, 7)
+        self.white_king_pos = king_white.position
+        self.black_king_pos = king_black.position
         self.captured_pieces = [["white"], ["black"]]
         self.last_move = [None, None, None, None]
 

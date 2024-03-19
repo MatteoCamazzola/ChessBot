@@ -18,28 +18,30 @@ class Board:
         pawn_black_1 = Pawn("black", 6, 0)
         pawn_black_2 = Pawn("black", 6, 1)
         pawn_black_3 = Pawn("black", 6, 2)
-        pawn_black_4 = Pawn("black", 5, 0)
-        pawn_black_5 = Pawn("black", 5, 1)
+        pawn_black_4 = Pawn("black", 6, 3)
+        pawn_black_5 = Pawn("black", 6, 4)
         pawn_black_6 = Pawn("black", 6, 5)
         pawn_black_7 = Pawn("black", 6, 6)
-        pawn_black_8 = Pawn("black", 4, 7)
+        pawn_black_8 = Pawn("black", 6, 7)
 
         rook_black_1 = Rook("black", 7, 0)
         rook_black_2 = Rook("black", 7, 7)
-        knight_black_1 = Knight("black", 7, 1)
-        knight_black_2 = Knight("black", 3, 3)
-        bishop_black_1 = Bishop("black", 7, 2)
+        knight_black_1 = Knight("black", 4, 1)
+        knight_black_2 = Knight("black", 7, 6)
+        bishop_black_1 = Bishop("black", 5, 2)
         bishop_black_2 = Bishop("black", 6, 4)
+
         queen_black = Queen("black", 1, 4)
         king_black = King("black", 7, 3)
+
 
         pawn_white_1 = Pawn("white", 1, 0)
         pawn_white_2 = Pawn("white", 1, 1)
         pawn_white_3 = Pawn("white", 1, 2)
         pawn_white_4 = Pawn("white", 2, 0)
         pawn_white_5 = Pawn("white", 2, 1)
-        pawn_white_6 = Pawn("white", 1, 5)
-        pawn_white_7 = Pawn("white", 4, 6)
+        pawn_white_6 = Pawn("white", 2, 5)
+        pawn_white_7 = Pawn("white", 4, 5)
         pawn_white_8 = Pawn("white", 1, 7)
 
         rook_white_1 = Rook("white", 0, 0)
@@ -89,7 +91,7 @@ class Board:
         self.chessBoard[pawn_black_8.position[0]][pawn_black_8.position[1]] = pawn_black_8
 
         self.white_king_pos = (0, 3)
-        self.black_king_pos = (7, 3)
+        self.black_king_pos = (4, 7)
         self.captured_pieces = [["white"], ["black"]]
         self.last_move = [None, None, None, None]
 
@@ -131,27 +133,25 @@ class Board:
         # check for moving into check
         moves_to_remove = []
         for move in list_of_moves:
-            if piece.piece_type != "king":
-                self.chessBoard[current_position[0]][current_position[1]] = None
-                temp = self.chessBoard[move[0]][move[1]]
-                self.chessBoard[move[0]][move[1]] = piece
-                if self.is_check(piece.colour):
-                    moves_to_remove.append(move)
-                self.chessBoard[current_position[0]][current_position[1]] = piece
-                self.chessBoard[move[0]][move[1]] = temp
-            else:
+            self.chessBoard[current_position[0]][current_position[1]] = None
+            temp = self.chessBoard[move[0]][move[1]]
+            self.chessBoard[move[0]][move[1]] = piece
+            temp_white = self.white_king_pos
+            temp_black = self.black_king_pos
+            if piece.piece_type == "king":
                 if piece.colour == "black":
-                    temp = self.black_king_pos
                     self.black_king_pos = move
-                    if self.is_check(piece.colour):
-                        moves_to_remove.append(move)
-                    self.black_king_pos = temp
                 else:
-                    temp = self.white_king_pos
                     self.white_king_pos = move
-                    if self.is_check(piece.colour):
-                        moves_to_remove.append(move)
-                    self.white_king_pos = temp
+            if self.is_check(piece.colour):
+                moves_to_remove.append(move)
+            self.chessBoard[current_position[0]][current_position[1]] = piece
+            self.chessBoard[move[0]][move[1]] = temp
+            if piece.piece_type == "king":
+                if piece.colour == "black":
+                    self.black_king_pos = temp_black
+                else:
+                    self.white_king_pos = temp_white
 
 
         for move in moves_to_remove:
@@ -579,8 +579,9 @@ class Board:
                     return False
         return True
 
-    # for en_passant need a last move i can store the last move made in list from the move fucntion getting executed then can
-    # check the list to see last move made see if its all good then i can clear the list and add the last move into the list again
+    # for en_passant need a last move i can store the last move made in list from the move fucntion getting executed
+    # then can check the list to see last move made see if its all good then i can clear the list and add the last
+    # move into the list again
     def en_passant(self, piece, list_of_moves, last_move):
         self.last_move = last_move
         if last_move == [None, None, None, None]:
@@ -642,3 +643,30 @@ class Board:
                 self.white_king_pos = (0, 5)
             else:
                 self.black_king_pos = (7, 5)
+
+    def promotions(self,move,piece):
+        if piece.piece_type=="pawn" and piece.colour=="white" and move.position[0]==7:
+            self.chessBoard[move.position[0]][move.position[1]] = None
+            new_piece=input("Would you piece would you like to promote to?")
+            if new_piece=="bishop":
+                pass
+            elif new_piece=="knight":
+                pass
+            elif new_piece=="rook":
+                pass
+            elif new_piece=="queen":
+                pass
+            else:
+                return("please enter a valid piece name")
+        elif piece.piece_type=="pawn" and piece.colour=="black" and move.position[0]==0:
+            new_piece = input("Would you piece would you like to promote to?")
+            if new_piece == "bishop":
+                pass
+            elif new_piece == "knight":
+                pass
+            elif new_piece == "rook":
+                pass
+            elif new_piece == "queen":
+                pass
+            else:
+                return ("please enter a valid piece name")

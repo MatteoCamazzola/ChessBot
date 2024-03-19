@@ -38,6 +38,7 @@ def place_pieces():
                                     anchor="center", tags="piece")
 
 
+
 def on_canvas_click(event):
     global selected_piece
     global current_player
@@ -137,5 +138,4 @@ draw_chessboard()
 place_pieces()
 
 canvas.bind("<Button-1>", on_canvas_click)
-is_check = gameBoard.is_check("white")
 root.mainloop()

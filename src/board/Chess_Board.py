@@ -15,10 +15,10 @@ class Board:
 
         # make all our pieces
 
-        pawn_black_1 = Pawn("black", 4, 0)
+        pawn_black_1 = Pawn("black", 6, 0)
         pawn_black_2 = Pawn("black", 6, 1)
         pawn_black_3 = Pawn("black", 6, 2)
-        pawn_black_4 = Pawn("black", 6, 3)
+        pawn_black_4 = Pawn("black", 5, 3)
         pawn_black_5 = Pawn("black", 6, 4)
         pawn_black_6 = Pawn("black", 6, 5)
         pawn_black_7 = Pawn("black", 6, 6)
@@ -32,13 +32,13 @@ class Board:
         bishop_black_2 = Bishop("black", 7, 5)
 
         queen_black = Queen("black", 7, 4)
-        king_black = King("black", 7, 3)
+        king_black = King("black", 5, 6)
 
 
-        pawn_white_1 = Pawn("white", 3, 0)
+        pawn_white_1 = Pawn("white", 1, 0)
         pawn_white_2 = Pawn("white", 1, 1)
         pawn_white_3 = Pawn("white", 1, 2)
-        pawn_white_4 = Pawn("white", 1, 3)
+        pawn_white_4 = Pawn("white", 6, 3)
         pawn_white_5 = Pawn("white", 1, 4)
         pawn_white_6 = Pawn("white", 1, 5)
         pawn_white_7 = Pawn("white", 1, 6)
@@ -93,7 +93,7 @@ class Board:
         self.white_king_pos = king_white.position
         self.black_king_pos = king_black.position
         self.captured_pieces = [["white"], ["black"]]
-        self.last_move = [None, None, None, None]
+        self.last_move = [None, None, None, None,None,None]
 
     @staticmethod
     def coordinates_to_index(coordinate):
@@ -128,7 +128,7 @@ class Board:
 
         if piece.piece_type == "pawn":
             self.pawn_diagonal(piece, list_of_moves)
-        self.en_passant(piece, list_of_moves, self.last_move)
+            self.en_passant(piece, list_of_moves, self.last_move)
 
         # check for moving into check
         moves_to_remove = []
@@ -414,7 +414,7 @@ class Board:
         if self.chessBoard[row][col] != None:
             if self.chessBoard[row][col].colour == piece_to_move.colour:
                 self.castle_handler(row, col, piece_to_move)
-                self.last_move = [None, None, None, None]
+                self.last_move = [None, None, None, None,None,None]
 
             else:
                 if piece_to_move.piece_type == "king":
@@ -436,7 +436,7 @@ class Board:
                 self.chessBoard[piece_to_move.position[0]][piece_to_move.position[1]] = None
                 piece_to_move.position = (row, col)
                 self.chessBoard[row][col] = piece_to_move
-                self.last_move = [row, col, piece_to_move.piece_type, piece_to_move.colour]
+
 
         else:
             if piece_to_move.piece_type == "king":
@@ -455,10 +455,21 @@ class Board:
                         self.capture_handler(self.chessBoard[row + 1][col])
                 else:
                     self.capture_handler(self.chessBoard[row][col])
+
+            init_row=piece_to_move.position[0]
+            init_col=piece_to_move.position[1]
             self.chessBoard[piece_to_move.position[0]][piece_to_move.position[1]] = None
             piece_to_move.position = (row, col)
             self.chessBoard[row][col] = piece_to_move
-            self.last_move = [row, col, piece_to_move.piece_type, piece_to_move.colour]
+            if piece_to_move.piece_type == "pawn" and piece_to_move.position[
+                0] == 7 and piece_to_move.colour == "white":
+                self.promotions(row, col, piece_to_move)  # Pass row, col of the promoted piece
+            elif piece_to_move.piece_type == "pawn" and piece_to_move.position[
+                0] == 0 and piece_to_move.colour == "black":
+                self.promotions(row, col, piece_to_move)  # Pass row, col of the promoted piece
+
+            self.last_move = [row, col, piece_to_move.piece_type, piece_to_move.colour, init_row, init_col]
+
 
     def add_castling(self, piece, list_of_moves):
         colour = piece.colour
@@ -587,11 +598,10 @@ class Board:
     # then can check the list to see last move made see if its all good then i can clear the list and add the last
     # move into the list again
     def en_passant(self, piece, list_of_moves, last_move):
-        self.last_move = last_move
-        if last_move == [None, None, None, None]:
+        if last_move == [None, None, None, None,None,None]:
             return
-        last_row, last_col, last_piece_type, last_piece_colour = last_move
-        if piece.piece_type == "pawn" and last_piece_type == "pawn" and piece.colour != last_piece_colour:
+        last_row, last_col, last_piece_type, last_piece_colour,init_row,init_col = last_move
+        if piece.piece_type == "pawn" and last_piece_type == "pawn" and piece.colour != last_piece_colour and abs(init_row-last_row)==2:
             if abs(last_row - piece.position[0]) == 0 and abs(last_col - piece.position[1]) == 1:
                 if piece.colour == "white":
                     en_passant_row = piece.position[0] + 1
@@ -648,29 +658,52 @@ class Board:
             else:
                 self.black_king_pos = (7, 5)
 
-    def promotions(self,move,piece):
-        if piece.piece_type=="pawn" and piece.colour=="white" and move.position[0]==7:
-            self.chessBoard[move.position[0]][move.position[1]] = None
-            new_piece=input("Would you piece would you like to promote to?")
-            if new_piece=="bishop":
-                pass
-            elif new_piece=="knight":
-                pass
-            elif new_piece=="rook":
-                pass
-            elif new_piece=="queen":
-                pass
+    def promotions(self, row, col, piece_to_move):
+        piece_colour=piece_to_move.colour
+        if piece_to_move.piece_type == "pawn" and ((piece_to_move.colour == "white" and row == 7) or (piece_to_move.colour == "black" and row == 0)):
+            self.chessBoard[row][col] = None
+            piece_mapping = {
+                "bishop": Bishop(piece_colour, row, col),
+                "knight": Knight(piece_colour, row, col),
+                "rook": Rook(piece_colour, row, col),
+                "queen": Queen(piece_colour, row, col)
+            }
+            new_piece = input("Which piece would you like to promote to? ")
+            promoted_piece = piece_mapping.get(new_piece.lower())
+            if promoted_piece:
+                self.chessBoard[row][col] = promoted_piece
             else:
-                return("please enter a valid piece name")
-        elif piece.piece_type=="pawn" and piece.colour=="black" and move.position[0]==0:
-            new_piece = input("Would you piece would you like to promote to?")
-            if new_piece == "bishop":
-                pass
-            elif new_piece == "knight":
-                pass
-            elif new_piece == "rook":
-                pass
-            elif new_piece == "queen":
-                pass
-            else:
-                return ("please enter a valid piece name")
+                print("Please enter a valid piece name")
+
+    def checkmate(self,colour):
+        if self.is_check(colour):
+            current_position = self.white_king_pos if colour == "white" else self.black_king_pos
+            king_moves = self.valid_moves(current_position)
+            if not king_moves:
+                for piece in self.checkmate_stalemate_iteration(colour):
+                    piece_moves = self.valid_moves(piece.position)
+                    if piece_moves:
+                        return False
+                return True
+
+    def stalemate(self,colour):
+        if not self.is_check(colour):
+            current_position = self.white_king_pos if colour == "white" else self.black_king_pos
+            king_moves = self.valid_moves(current_position)
+            if not king_moves:
+                for piece in self.checkmate_stalemate_iteration(colour):
+                    piece_moves = self.valid_moves(piece.position)
+                    if piece_moves:
+                        return False
+                return True
+
+    def checkmate_stalemate_iteration(self, colour):
+        pieces = []
+        for x in range(8):
+            for y in range(8):
+                piece = self.chessBoard[x][y]
+                if piece is not None and piece.colour == colour and piece!="king":
+                    pieces.append(piece)
+        return pieces
+
+

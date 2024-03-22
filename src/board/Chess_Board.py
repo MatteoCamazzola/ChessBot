@@ -670,10 +670,16 @@ class Board:
             promoted_piece = piece_mapping.get(new_piece.lower())
             if promoted_piece:
                 self.chessBoard[row][col] = promoted_piece
-            else:
-                while not promoted_piece:
+
+            while not promoted_piece:
+                promoted_piece = piece_mapping.get(new_piece.lower())
+                if promoted_piece:
+                       self.chessBoard[row][col] = promoted_piece
+                       continue
+                else:
                     print("Please enter a valid piece name")
-                    input("Which piece would you like to promote to? ")
+                    new_piece = input("Which piece would you like to promote to? ")
+
 
 
     def checkmate(self,colour):

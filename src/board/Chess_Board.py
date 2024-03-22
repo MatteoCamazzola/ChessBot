@@ -35,7 +35,7 @@ class Board:
         king_black = King("black", 5, 6)
 
 
-        pawn_white_1 = Pawn("white", 1, 0)
+        pawn_white_1 = Pawn("white", 3, 7)
         pawn_white_2 = Pawn("white", 1, 1)
         pawn_white_3 = Pawn("white", 1, 2)
         pawn_white_4 = Pawn("white", 6, 3)
@@ -44,7 +44,7 @@ class Board:
         pawn_white_7 = Pawn("white", 1, 6)
         pawn_white_8 = Pawn("white", 1, 7)
 
-        rook_white_1 = Rook("white", 0, 0)
+        rook_white_1 = Rook("white", 3, 0)
         rook_white_2 = Rook("white", 0, 7)
         knight_white_1 = Knight("white", 2, 1)
         knight_white_2 = Knight("white", 2, 6)
@@ -238,8 +238,6 @@ class Board:
             for y in range(8):
                 piece = self.chessBoard[x][y]
                 if piece is None:
-                    continue
-                elif piece.piece_type == "king" and piece.colour != colour:
                     continue
                 elif piece.colour != colour and piece.colour == "black":
                     if self.white_king_pos in self.list_of_moves_for_check(piece):
@@ -436,6 +434,12 @@ class Board:
                 self.chessBoard[piece_to_move.position[0]][piece_to_move.position[1]] = None
                 piece_to_move.position = (row, col)
                 self.chessBoard[row][col] = piece_to_move
+                if piece_to_move.piece_type == "pawn" and piece_to_move.position[
+                    0] == 7 and piece_to_move.colour == "white":
+                    self.promotions(row, col, piece_to_move)  # Pass row, col of the promoted piece
+                elif piece_to_move.piece_type == "pawn" and piece_to_move.position[
+                    0] == 0 and piece_to_move.colour == "black":
+                    self.promotions(row, col, piece_to_move)  # Pass row, col of the promoted piece
 
 
         else:
@@ -673,7 +677,10 @@ class Board:
             if promoted_piece:
                 self.chessBoard[row][col] = promoted_piece
             else:
-                print("Please enter a valid piece name")
+                while not promoted_piece:
+                    print("Please enter a valid piece name")
+                    input("Which piece would you like to promote to? ")
+
 
     def checkmate(self,colour):
         if self.is_check(colour):

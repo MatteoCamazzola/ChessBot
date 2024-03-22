@@ -132,9 +132,11 @@ def show_possible_moves(piece):
             canvas.valid_move_images = []
         canvas.valid_move_images.append(photo_img)
 
+def check_for_game_over():
 
 draw_chessboard()
 place_pieces()
 
 canvas.bind("<Button-1>", on_canvas_click)
+print("hi")
 root.mainloop()

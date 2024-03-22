@@ -43,6 +43,11 @@ def on_canvas_click(event):
     global current_player
     col = int(event.x // square_size)
     row = int(event.y // square_size)
+    checkmate_check_colour = current_player
+    if current_player =="black":
+        checkmate_check_colour = "white"
+    else:
+        checkmate_check_colour = "black"
     # Now you have the row and column stored in row and col variables
     print(f"Clicked on row: {row}, col: {col}")
     piece = gameBoard.chessBoard[row][col]
@@ -74,6 +79,7 @@ def on_canvas_click(event):
             place_pieces()
             selected_piece = None
             remove_possible_moves()
+            root.after(200, lambda: check_for_game_over(checkmate_check_colour))
             if current_player == "white":
                 current_player = "black"
             else:
@@ -86,6 +92,7 @@ def on_canvas_click(event):
                 place_pieces()
                 selected_piece = None
                 remove_possible_moves()
+                root.after(200, lambda: check_for_game_over(checkmate_check_colour))
                 if current_player == "white":
                     current_player = "black"
                 else:
@@ -132,7 +139,28 @@ def show_possible_moves(piece):
             canvas.valid_move_images = []
         canvas.valid_move_images.append(photo_img)
 
-def check_for_game_over():
+
+import tkinter as tk
+from tkinter import messagebox
+
+def check_for_game_over(checkmate_check_colour):
+    game_over_message = ""
+    if gameBoard.checkmate(checkmate_check_colour):
+        game_over_message = "Checkmate. "
+        if checkmate_check_colour == "black":
+            game_over_message += "White wins!"
+        else:
+            game_over_message += "Black wins!"
+    elif gameBoard.stalemate(checkmate_check_colour):
+        game_over_message = "Stalemate. The game is a draw."
+
+    if game_over_message:  # If there's a game over message to display
+        # Show the game over message in a pop-up
+        messagebox.showinfo("Game Over", game_over_message)
+        root.destroy()  # Close the Tkinter window after the user acknowledges the message
+
+
+
 
 draw_chessboard()
 place_pieces()

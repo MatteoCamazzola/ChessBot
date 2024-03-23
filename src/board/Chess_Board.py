@@ -1,3 +1,4 @@
+from random import choice
 from src.pieces.pawn import Pawn
 from src.pieces.knight import Knight
 from src.pieces.bishop import Bishop
@@ -170,12 +171,11 @@ class Board:
 
             elif other_piece is not None and piece.piece_type == "pawn" and abs(
                     piece.position[0] - other_piece.position[0]) == 1:
-                moves_to_remove.append(move)
-                pass
+                list_of_moves.clear()
+                break
 
             elif other_piece is not None and piece.piece_type == "pawn":
                 moves_to_remove.append(move)
-
         # Remove moves from the original list
         for move in moves_to_remove:
             list_of_moves.remove(move)

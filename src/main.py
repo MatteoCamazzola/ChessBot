@@ -1,6 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageDraw, ImageTk
 from src.board.Chess_Board import Board
+from src.bot.algorthim import random_moves
 
 root = tk.Tk()
 root.title("Chessboard")
@@ -12,6 +13,7 @@ selected_piece = None
 square_size = 59
 gameBoard = Board()
 
+return_from_function = random_moves(gameBoard)
 
 def draw_chessboard():
     square_color = "#F5F5DC"

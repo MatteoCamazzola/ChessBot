@@ -7,8 +7,8 @@ from random import choice
 # To summarize:
 # Input: instance of type Board (will always be gameBoard)
 # Output: piece(the actual INSTANCE such as the knight or pawn object as we can see in the debugger), row and col to move to
-colour="black"
-def random_moves(gameBoard):
+def random_moves(gameBoard, colour_parameter):
+    colour = colour_parameter
     pieces = []
     for x in range(8):
         for y in range(8):

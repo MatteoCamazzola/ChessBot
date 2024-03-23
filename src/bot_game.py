@@ -12,7 +12,7 @@ current_player = "white"
 selected_piece = None
 square_size = 59
 gameBoard = Board()
-bot_move = random_moves(gameBoard, "black")
+
 
 def draw_chessboard():
     square_color = "#F5F5DC"
@@ -45,14 +45,14 @@ def on_canvas_click(event):
     col = int(event.x // square_size)
     row = int(event.y // square_size)
     checkmate_check_colour = current_player
-    if current_player =="black":
+    if current_player == "black":
         checkmate_check_colour = "white"
     else:
         checkmate_check_colour = "black"
     # Now you have the row and column stored in row and col variables
     print(f"Clicked on row: {row}, col: {col}")
     piece = gameBoard.chessBoard[row][col]
-    # if clicking on piece
+    # if clicking on piece that is your own colour
     if piece is not None and piece.colour == current_player:
         valid_moves = []
         if selected_piece != None:
@@ -62,10 +62,16 @@ def on_canvas_click(event):
             place_pieces()
             selected_piece = None
             remove_possible_moves()
+            root.after(200, lambda: check_for_game_over(checkmate_check_colour))
+            # bot move
             if current_player == "white":
-                current_player = "black"
+                bot_colour = "black"
             else:
-                current_player = "white"
+                bot_colour = "white"
+            bot_move = random_moves(gameBoard, bot_colour)
+            gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
+                                bot_move[0])
+            place_pieces()
         elif piece == selected_piece:
             remove_possible_moves()
             selected_piece = None
@@ -73,7 +79,7 @@ def on_canvas_click(event):
             selected_piece = piece
             remove_possible_moves()
             show_possible_moves(piece)
-    # make move
+    # moving piece to open square
     elif piece is None and selected_piece is not None:
         if gameBoard.is_valid_move((row, col), selected_piece):
             gameBoard.make_move(row, col, gameBoard.valid_moves(selected_piece.position), selected_piece)
@@ -81,10 +87,16 @@ def on_canvas_click(event):
             selected_piece = None
             remove_possible_moves()
             root.after(200, lambda: check_for_game_over(checkmate_check_colour))
+            # bot move
             if current_player == "white":
-                current_player = "black"
+                bot_colour = "black"
             else:
-                current_player = "white"
+                bot_colour = "white"
+            bot_move = random_moves(gameBoard, bot_colour)
+            gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
+                                bot_move[0])
+            place_pieces()
+
     # capture piece
     if selected_piece != None:
         if (piece is not None and piece.colour != selected_piece.colour):
@@ -94,10 +106,15 @@ def on_canvas_click(event):
                 selected_piece = None
                 remove_possible_moves()
                 root.after(200, lambda: check_for_game_over(checkmate_check_colour))
+                # bot move
                 if current_player == "white":
-                    current_player = "black"
+                    bot_colour = "black"
                 else:
-                    current_player = "white"
+                    bot_colour = "white"
+                bot_move = random_moves(gameBoard, bot_colour)
+                gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
+                                    bot_move[0])
+                place_pieces()
 
 
 def remove_possible_moves():
@@ -144,6 +161,7 @@ def show_possible_moves(piece):
 import tkinter as tk
 from tkinter import messagebox
 
+
 def check_for_game_over(checkmate_check_colour):
     game_over_message = ""
     if gameBoard.checkmate(checkmate_check_colour):
@@ -161,9 +179,8 @@ def check_for_game_over(checkmate_check_colour):
         root.destroy()  # Close the Tkinter window after the user acknowledges the message
 
 
-
-
 draw_chessboard()
 place_pieces()
+
 canvas.bind("<Button-1>", on_canvas_click)
 root.mainloop()

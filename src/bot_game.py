@@ -69,9 +69,10 @@ def on_canvas_click(event):
             else:
                 bot_colour = "white"
             bot_move = random_moves(gameBoard, bot_colour)
-            gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
-                                bot_move[0])
-            place_pieces()
+            if bot_move is not None:
+                gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
+                                    bot_move[0])
+                place_pieces()
         elif piece == selected_piece:
             remove_possible_moves()
             selected_piece = None
@@ -93,9 +94,10 @@ def on_canvas_click(event):
             else:
                 bot_colour = "white"
             bot_move = random_moves(gameBoard, bot_colour)
-            gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
-                                bot_move[0])
-            place_pieces()
+            if bot_move is not None:
+                gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
+                                    bot_move[0])
+                place_pieces()
 
     # capture piece
     if selected_piece != None:
@@ -112,9 +114,10 @@ def on_canvas_click(event):
                 else:
                     bot_colour = "white"
                 bot_move = random_moves(gameBoard, bot_colour)
-                gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
-                                    bot_move[0])
-                place_pieces()
+                if bot_move is not None:
+                    gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
+                                        bot_move[0])
+                    place_pieces()
 
 
 def remove_possible_moves():

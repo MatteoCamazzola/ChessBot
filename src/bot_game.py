@@ -1,7 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageDraw, ImageTk
 from src.board.Chess_Board import Board
-from src.bot.algorthim import random_moves
 from src.bot.algorthim import get_best_move
 
 root = tk.Tk()
@@ -83,7 +82,7 @@ def on_canvas_click(event):
                 bot_colour = "black"
             else:
                 bot_colour = "white"
-            bot_move = random_moves(gameBoard, bot_colour)
+            bot_move = get_best_move(gameBoard, 3,bot_colour)
             if bot_move is not None:
                 gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                                     bot_move[0])
@@ -108,7 +107,7 @@ def on_canvas_click(event):
                 bot_colour = "black"
             else:
                 bot_colour = "white"
-            bot_move = random_moves(gameBoard, bot_colour)
+            bot_move = get_best_move(gameBoard,3, bot_colour)
             if bot_move is not None:
                 gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                                     bot_move[0])
@@ -128,7 +127,7 @@ def on_canvas_click(event):
                     bot_colour = "black"
                 else:
                     bot_colour = "white"
-                bot_move = random_moves(gameBoard, bot_colour)
+                bot_move = get_best_move(gameBoard,3, bot_colour)
                 if bot_move is not None:
                     gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                                         bot_move[0])
@@ -232,7 +231,7 @@ draw_chessboard()
 place_pieces()
 if current_player == "black":
     bot_colour = "white"
-    bot_move = random_moves(gameBoard, bot_colour)
+    bot_move = get_best_move(gameBoard, 3, bot_colour)
     if bot_move is not None:
         gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                             bot_move[0])

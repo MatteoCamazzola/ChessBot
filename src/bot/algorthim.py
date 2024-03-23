@@ -29,4 +29,35 @@ def random_moves(gameBoard, colour_parameter):
                 random_move = choice(random_piece_moves)  # Choose a random move for the random piece
                 return random_piece, random_move  # Return the piece and the randomly selected move
                 continue
+            else:
+                if gameBoard.checkmate(colour) or gameBoard.stalemate(colour):
+                    return None
+                    continue
+    else:
+        return None
+
+def piece_values(gameBoard):
+    white_values = 0
+    black_values = 0
+
+    piece_values = {
+        "pawn": 1,
+        "knight": 3,
+        "bishop": 3,
+        "rook": 5,
+        "queen": 9
+    }
+
+    for x in range(8):
+        for y in range(8):
+            piece = gameBoard.chessBoard[x][y]
+            if piece is not None and piece.piece_type != "king":
+                value = piece_values.get(piece.piece_type, 0)
+                if piece.colour == "white":
+                    white_values += value
+                elif piece.colour == "black":
+                    black_values += value
+
+    piece_value_eval=white_values - black_values
+    return piece_value_eval
 

@@ -25,15 +25,15 @@ class Board:
         pawn_black_7 = Pawn("black", 6, 6)
         pawn_black_8 = Pawn("black", 6, 7)
 
-        rook_black_1 = Rook("black", 7, 0)
-        rook_black_2 = Rook("black", 7, 7)
-        knight_black_1 = Knight("black", 7, 1)
+        rook_black_1 = Rook("black", 5, 6)
+        rook_black_2 = Rook("black", 7, 1)
+        knight_black_1 = Knight("black", 7, 3)
         knight_black_2 = Knight("black", 7, 6)
-        bishop_black_1 = Bishop("black", 7, 2)
+        bishop_black_1 = Bishop("black", 7, 7)
         bishop_black_2 = Bishop("black", 7, 5)
 
         queen_black = Queen("black", 7, 4)
-        king_black = King("black", 5, 6)
+        king_black = King("black", 7, 0)
 
 
         pawn_white_1 = Pawn("white", 3, 7)
@@ -424,13 +424,7 @@ class Board:
                     piece_to_move.has_moved = True
                 possible_captures = self.possible_captures(list_of_moves, piece_to_move, self.last_move)
                 if (row, col) in possible_captures:
-                    if self.chessBoard[row][col] == None:
-                        if piece_to_move.colour == "white":
-                            self.capture_handler(self.chessBoard[row - 1][col])
-                        else:
-                            self.capture_handler(self.chessBoard[row + 1][col])
-                    else:
-                        self.capture_handler(self.chessBoard[row][col])
+                     self.capture_handler(self.chessBoard[row][col])
                 self.chessBoard[piece_to_move.position[0]][piece_to_move.position[1]] = None
                 piece_to_move.position = (row, col)
                 self.chessBoard[row][col] = piece_to_move
@@ -718,5 +712,6 @@ class Board:
                 if piece is not None and piece.colour == colour and piece!="king":
                     pieces.append(piece)
         return pieces
+
 
 

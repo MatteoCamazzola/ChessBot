@@ -2,6 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageDraw, ImageTk
 from src.board.Chess_Board import Board
 from src.bot.algorthim import random_moves
+from src.bot.algorthim import get_best_move
 
 root = tk.Tk()
 root.title("Chessboard")

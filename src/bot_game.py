@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw, ImageTk
 from src.board.Chess_Board import Board
 from src.bot.algorthim import get_best_move
 from src.bot.algorthim import random_moves
+import csv
 
 root = tk.Tk()
 root.title("Chessboard")
@@ -15,6 +16,17 @@ selected_piece = None
 current_player = "white"
 square_size = 59
 gameBoard = Board()
+
+# setup opening_theory file
+
+
+
+with open("a.tsv", "r", encoding="utf8") as opening_file:
+    tsv_reader = csv.reader(opening_file, delimiter="\t")
+    next(tsv_reader)
+    for row in tsv_reader:
+        (pgn) = row
+        print(f"{pgn} is rank {pgn}")
 
 
 def draw_chessboard():
@@ -234,6 +246,10 @@ def current_player_swap():
         current_player = "black"
     else:
         current_player = "white"
+
+
+def translator_to_pgn(row_to_move, col_to_move, piece_to_move):
+    pass
 
 
 draw_chessboard()

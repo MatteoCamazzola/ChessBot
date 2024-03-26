@@ -95,7 +95,7 @@ class Board:
         self.captured_pieces = [["white"], ["black"]]
         self.last_move = [None, None, None, None, None, None]
         self.number_of_moves_made = 0
-        self.previous_moves = []
+        self.previous_moves = ''
 
     @staticmethod
     def coordinates_to_index(coordinate):

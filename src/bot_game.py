@@ -89,10 +89,11 @@ def on_canvas_click(event):
         if (row, col) in valid_moves:
 
             # stuff for book moves for bot
-            pgn_move = translator_to_pgn(row, col, selected_piece)
-            gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
-            gameBoard.previous_moves += (
-                                            f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
+            if gameBoard.number_of_moves_made < 20:
+                pgn_move = translator_to_pgn(row, col, selected_piece)
+                gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
+                gameBoard.previous_moves += (
+                                                f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
 
             gameBoard.make_move(row, col, gameBoard.valid_moves(selected_piece.position), selected_piece)
             place_pieces()
@@ -103,10 +104,11 @@ def on_canvas_click(event):
             # bot move
             bot_move = random_moves(gameBoard, 3, current_player)
             if bot_move is not None:
-                pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
-                gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
-                gameBoard.previous_moves += (
-                                                f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
+                if gameBoard.number_of_moves_made < 20:
+                    pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
+                    gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
+                    gameBoard.previous_moves += (
+                                                    f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
 
                 gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                                     bot_move[0])
@@ -123,11 +125,11 @@ def on_canvas_click(event):
     # moving piece to open square
     elif piece is None and selected_piece is not None:
         if gameBoard.is_valid_move((row, col), selected_piece):
-
-            pgn_move = translator_to_pgn(row, col, selected_piece)
-            gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
-            gameBoard.previous_moves += (
-                                            f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
+            if gameBoard.number_of_moves_made < 20:
+                pgn_move = translator_to_pgn(row, col, selected_piece)
+                gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
+                gameBoard.previous_moves += (
+                                                f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
 
             gameBoard.make_move(row, col, gameBoard.valid_moves(selected_piece.position), selected_piece)
             place_pieces()
@@ -138,10 +140,11 @@ def on_canvas_click(event):
             # bot move
             bot_move = random_moves(gameBoard, 3, current_player)
             if bot_move is not None:
-                pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
-                gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
-                gameBoard.previous_moves += (
-                                                f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
+                if gameBoard.number_of_moves_made < 20:
+                    pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
+                    gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
+                    gameBoard.previous_moves += (
+                                                    f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
 
                 gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                                     bot_move[0])
@@ -152,10 +155,12 @@ def on_canvas_click(event):
     if selected_piece != None:
         if (piece is not None and piece.colour != selected_piece.colour):
             if gameBoard.is_valid_move((row, col), selected_piece):
-                pgn_move = translator_to_pgn(row, col, selected_piece)
-                gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
-                gameBoard.previous_moves += (
-                                                f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
+                if gameBoard.number_of_moves_made < 20:
+                    pgn_move = translator_to_pgn(row, col, selected_piece)
+                    gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
+                    gameBoard.previous_moves += (
+                                                    f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
+
                 gameBoard.make_move(row, col, gameBoard.valid_moves(selected_piece.position), selected_piece)
                 place_pieces()
                 selected_piece = None
@@ -355,10 +360,13 @@ if (play_as_bot and selected_colour == "white") or (selected_colour == "black" a
     bot_colour = selected_colour
     bot_move = random_moves(gameBoard, 3, bot_colour)
     if bot_move is not None:
-        pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
-        gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
-        gameBoard.previous_moves += (
-                                        f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
+        if gameBoard.number_of_moves_made < 20:
+            pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
+            gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
+            gameBoard.previous_moves += (
+                                            f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
+
+
         gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                             bot_move[0])
         place_pieces()

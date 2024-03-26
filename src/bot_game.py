@@ -2,16 +2,21 @@ import tkinter as tk
 from PIL import Image, ImageDraw, ImageTk
 from src.board.Chess_Board import Board
 from src.bot.algorthim import get_best_move
+from src.bot.algorthim import random_moves
 
 root = tk.Tk()
 root.title("Chessboard")
 canvas = tk.Canvas(root, width=472, height=472)
 canvas.pack()
 
-current_player = "black"
+
+play_as_bot = True
+selected_colour = "white"
 selected_piece = None
+current_player = "white"
 square_size = 59
 gameBoard = Board()
+
 
 def draw_chessboard():
     square_color = "#F5F5DC"
@@ -29,7 +34,7 @@ def draw_chessboard():
 def place_pieces():
     # Delete all previously drawn pieces
     canvas.delete("piece")
-    if current_player == "black":
+    if selected_colour == "black":
         for row in range(8):
             for col in range(8):
                 piece = gameBoard.chessBoard[row][col]
@@ -38,7 +43,7 @@ def place_pieces():
                     canvas.create_image(col * 59 + 59 / 2, row * 59 + 59 / 2, image=piece.image,
                                         anchor="center", tags="piece")
     else:
-        #swap_board()
+        # swap_board()
         for row in range(8):
             for col in range(8):
                 piece = gameBoard.chessBoard[row][col]
@@ -49,16 +54,16 @@ def place_pieces():
                     canvas.create_image(new_col * 59 + 59 / 2, new_row * 59 + 59 / 2, image=piece.image,
                                         anchor="center", tags="piece")
 
+
 def on_canvas_click(event):
     global selected_piece
-    global current_player
-    if current_player == "white":
+    global selected_colour
+    if selected_colour == "white":
         col = row_col_swap(int(event.x // square_size))
         row = row_col_swap(int(event.y // square_size))
     else:
         col = int(event.x // square_size)
         row = int(event.y // square_size)
-    checkmate_check_colour = current_player
     if current_player == "black":
         checkmate_check_colour = "white"
     else:
@@ -77,16 +82,15 @@ def on_canvas_click(event):
             selected_piece = None
             remove_possible_moves()
             root.after(200, lambda: check_for_game_over(checkmate_check_colour))
+            current_player_swap()
             # bot move
-            if current_player == "white":
-                bot_colour = "black"
-            else:
-                bot_colour = "white"
-            bot_move = get_best_move(gameBoard, 3,bot_colour)
+            bot_move = random_moves(gameBoard, 3, current_player)
             if bot_move is not None:
                 gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                                     bot_move[0])
                 place_pieces()
+                current_player_swap()
+
         elif piece == selected_piece:
             remove_possible_moves()
             selected_piece = None
@@ -102,16 +106,19 @@ def on_canvas_click(event):
             selected_piece = None
             remove_possible_moves()
             root.after(200, lambda: check_for_game_over(checkmate_check_colour))
+            current_player_swap()
             # bot move
             if current_player == "white":
                 bot_colour = "black"
             else:
                 bot_colour = "white"
             bot_move = get_best_move(gameBoard,3,bot_colour)
+
             if bot_move is not None:
                 gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                                     bot_move[0])
                 place_pieces()
+                current_player_swap()
 
     # capture piece
     if selected_piece != None:
@@ -122,16 +129,14 @@ def on_canvas_click(event):
                 selected_piece = None
                 remove_possible_moves()
                 root.after(200, lambda: check_for_game_over(checkmate_check_colour))
+                current_player_swap()
                 # bot move
-                if current_player == "white":
-                    bot_colour = "black"
-                else:
-                    bot_colour = "white"
-                bot_move = get_best_move(gameBoard,3, bot_colour)
+                bot_move = random_moves(gameBoard, 3, current_player)
                 if bot_move is not None:
                     gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                                         bot_move[0])
                     place_pieces()
+                current_player_swap()
 
 
 def remove_possible_moves():
@@ -148,7 +153,7 @@ def show_possible_moves(piece):
 
     for move in valid_moves:
         row, col = move
-        if current_player == "white":
+        if selected_colour == "white":
             row = row_col_swap(row)
             col = row_col_swap(col)
 
@@ -198,6 +203,7 @@ def check_for_game_over(checkmate_check_colour):
         messagebox.showinfo("Game Over", game_over_message)
         root.destroy()  # Close the Tkinter window after the user acknowledges the message
 
+
 def row_col_swap(to_swap):
     if to_swap == 0:
         return 7
@@ -216,6 +222,7 @@ def row_col_swap(to_swap):
     if to_swap == 7:
         return 0
 
+
 def swap_board():
     for row in range(4):
         for col in range(8):
@@ -227,16 +234,33 @@ def swap_board():
             gameBoard.chessBoard[row][col] = temp
 
 
+def current_player_swap():
+    global current_player
+    if current_player == "white":
+        current_player = "black"
+    else:
+        current_player = "white"
+
+
 draw_chessboard()
 place_pieces()
-if current_player == "black":
-    bot_colour = "white"
-    bot_move = get_best_move(gameBoard, 3, bot_colour)
+
+if play_as_bot and selected_colour == "white":
+    bot_colour = selected_colour
+    bot_move = random_moves(gameBoard, 3, bot_colour)
     if bot_move is not None:
         gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                             bot_move[0])
         place_pieces()
+        current_player_swap()
 
+elif selected_colour == "black" and not play_as_bot:
+    bot_move = random_moves(gameBoard, 3, current_player)
+    if bot_move is not None:
+        gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
+                            bot_move[0])
+        place_pieces()
+        current_player_swap()
 
 canvas.bind("<Button-1>", on_canvas_click)
 root.mainloop()

@@ -37,7 +37,6 @@ def get_best_move(gameBoard, depth, colour_parameter):
     return best_piece, best_move
 
 
-
 def temp_move(temp_board, move):
     row, col, new_row, new_col = move
     if new_row==4 and new_col==1:
@@ -70,8 +69,7 @@ def unmake_move(self, move):
 
 
 
-
-def random_moves(gameBoard, colour_parameter):
+def random_moves(gameBoard, hi, colour_parameter):
     colour = colour_parameter
     pieces = []
     for x in range(8):

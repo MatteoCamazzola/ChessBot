@@ -91,7 +91,7 @@ class Board:
 
         self.white_king_pos = king_white.position
         self.black_king_pos = king_black.position
-        self.captured_pieces = [["white"], ["black"]]
+        self.captured_pieces = [[], []]#white first,black second
         self.last_move = [None, None, None, None, None, None]
         self.number_of_moves_made = 0
         self.previous_moves = ''

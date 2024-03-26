@@ -2,6 +2,7 @@ from random import choice
 import math
 best_piece = None
 best_move = None
+from src.pieces.queen import Queen
 
 def get_best_move(gameBoard, depth, colour_parameter):
     global best_piece, best_move
@@ -12,46 +13,50 @@ def get_best_move(gameBoard, depth, colour_parameter):
     if maximizingPlayer:
         for move in get_all_moves(gameBoard, colour_parameter):
             row, col, new_row, new_col = move  # Unpack the move tuple
-            if move == (6, 1, 4, 1):
-                pass
             temp_move(gameBoard, move)
             eval_score = mini(gameBoard, depth - 1, False, colour_parameter)
             unmake_move(gameBoard,move)  # Undo the move
             if eval_score > best_score:
                 best_score = eval_score
-                best_move = move
+                row, col, new_row, new_col= move
+                best_move=(new_row,new_col)
                 best_piece = gameBoard.chessBoard[row][col]  # Get the piece at the start position
     else:
         for move in get_all_moves(gameBoard, colour_parameter):
             row, col, new_row, new_col = move  # Unpack the move tuple
-            if move == (6, 1, 4, 1):
-                pass
             temp_move(gameBoard, move)
             eval_score = maxi(gameBoard, depth - 1, True, colour_parameter)
             unmake_move(gameBoard,move)  # Undo the move
             if eval_score < best_score:
                 best_score = eval_score
-                best_move = move
+                row, col, new_row, new_col=move
+                best_move = (new_row, new_col)
                 best_piece = gameBoard.chessBoard[row][col]  # Get the piece at the start position
 
     return best_piece, best_move
-
-
 def temp_move(temp_board, move):
     row, col, new_row, new_col = move
-    if new_row==4 and new_col==1:
-        pass
     piece_to_move = temp_board.chessBoard[row][col]
+
     if piece_to_move:  # Check if there's a piece at the given position
+        # Check for pawn promotion
+        if piece_to_move.piece_type == "pawn" and (new_row == 0 or new_row == 7):
+            # Promote the pawn to a queen
+            promoted_piece = Queen(piece_to_move.colour, new_row, new_col)
+            temp_board.chessBoard[new_row][new_col] = promoted_piece
+            return  # Exit the function without calling make_move
         list_of_moves_for_piece_to_move = temp_board.valid_moves(piece_to_move.position)
         if list_of_moves_for_piece_to_move:  # Check if valid_moves returned moves
-            temp_board.make_move(new_row, new_col, list_of_moves_for_piece_to_move, piece_to_move)
-
+            # Make the move and check if a capture occurred
+            captured_piece = temp_board.make_move(new_row, new_col, list_of_moves_for_piece_to_move, piece_to_move)
+            if captured_piece:
+                temp_board.captured_pieces[int(captured_piece.colour == "black")].append(captured_piece)
 
 
 def unmake_move(self, move):
     start_row, start_col, end_row, end_col = move
     piece_moved = self.chessBoard[end_row][end_col]
+
     if piece_moved is None:
         pass
     elif piece_moved.piece_type == "king":
@@ -67,6 +72,11 @@ def unmake_move(self, move):
     self.chessBoard[start_row][start_col] = piece_moved
     self.chessBoard[end_row][end_col] = None
 
+    # Restore captured pieces to the board
+    for colour_pieces in self.captured_pieces:
+        for captured_piece in colour_pieces:
+            if captured_piece:
+                self.chessBoard[captured_piece.position[0]][captured_piece.position[1]] = captured_piece
 
 
 def random_moves(gameBoard, hi, colour_parameter):
@@ -90,6 +100,8 @@ def random_moves(gameBoard, hi, colour_parameter):
             if random_piece_moves:
                 random_move = choice(random_piece_moves)
                 return random_piece, random_move
+            elif gameBoard.checkmate(colour) or gameBoard.stalemate(colour):
+                return None
     else:
         return None
 
@@ -125,8 +137,6 @@ def maxi(gameBoard, depth, maximizingPlayer, colour_parameter):
         return eval(gameBoard)
     max_score = float('-inf')
     for move in get_all_moves(gameBoard, 'white'):  # Assuming 'white' is the maximizing player
-        if move == (6, 1, 4, 1):
-            pass
         temp_move(gameBoard, move)  # Make the temporary move
         score = mini(gameBoard, depth - 1, False, colour_parameter)
         max_score = max(max_score, score)
@@ -139,8 +149,6 @@ def mini(gameBoard, depth, maximizingPlayer, colour_parameter):
         return -eval(gameBoard)
     min_score = float('inf')
     for move in get_all_moves(gameBoard, 'black'):# Assuming 'black' is the minimizing player
-        if move==(6,1,4,1):
-            pass
         temp_move(gameBoard, move)  # Make the temporary move
         score = maxi(gameBoard, depth - 1, True, colour_parameter)
         min_score = min(min_score, score)

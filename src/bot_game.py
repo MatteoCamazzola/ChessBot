@@ -143,7 +143,7 @@ def on_canvas_click(event):
                 bot_colour = "black"
             else:
                 bot_colour = "white"
-            bot_move = get_best_move(gameBoard,3,bot_colour)
+            bot_move = get_best_move(gameBoard,1,bot_colour)
 
             if bot_move is not None:
                 if gameBoard.number_of_moves_made < 20:
@@ -364,7 +364,7 @@ place_pieces()
 
 if (play_as_bot and selected_colour == "white") or (selected_colour == "black" and not play_as_bot):
     bot_colour = selected_colour
-    bot_move = random_moves(gameBoard, 3, bot_colour)
+    bot_move = get_best_move(gameBoard,3,bot_colour)
     if bot_move is not None:
         if gameBoard.number_of_moves_made < 20:
             pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])

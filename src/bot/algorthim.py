@@ -1,34 +1,76 @@
-from src.board.Chess_Board import Board
 from random import choice
-from copy import deepcopy
-
+import math
+best_piece = None
+best_move = None
 
 def get_best_move(gameBoard, depth, colour_parameter):
-    best_piece = None
-    best_move = None
-    best_score = float('-inf') if gameBoard.current_player == 'white' else float('inf')
+    global best_piece, best_move
+    maximizingPlayer = (colour_parameter == 'white')
+    best_score = float('-inf') if maximizingPlayer else float('inf')
 
-    for piece in gameBoard.get_all_pieces(colour_parameter):
-        for move in gameBoard.valid_moves(piece.position):
-            gameBoard_copy = deepcopy(gameBoard)
-            temp_move(gameBoard_copy, (piece.position[0], piece.position[1], move))
-            eval_score = minimax_alpha_beta(gameBoard_copy, depth - 1, float('-inf'), float('inf'), False,
-                                            colour_parameter)
-
-            if (gameBoard.current_player == 'white' and eval_score > best_score) or \
-                    (gameBoard.current_player == 'black' and eval_score < best_score):
+    # Call maxi or mini based on the maximizing player
+    if maximizingPlayer:
+        for move in get_all_moves(gameBoard, colour_parameter):
+            row, col, new_row, new_col = move  # Unpack the move tuple
+            if move == (6, 1, 4, 1):
+                pass
+            temp_move(gameBoard, move)
+            eval_score = mini(gameBoard, depth - 1, False, colour_parameter)
+            unmake_move(gameBoard,move)  # Undo the move
+            if eval_score > best_score:
                 best_score = eval_score
-                best_piece = piece
                 best_move = move
+                best_piece = gameBoard.chessBoard[row][col]  # Get the piece at the start position
+    else:
+        for move in get_all_moves(gameBoard, colour_parameter):
+            row, col, new_row, new_col = move  # Unpack the move tuple
+            if move == (6, 1, 4, 1):
+                pass
+            temp_move(gameBoard, move)
+            eval_score = maxi(gameBoard, depth - 1, True, colour_parameter)
+            unmake_move(gameBoard,move)  # Undo the move
+            if eval_score < best_score:
+                best_score = eval_score
+                best_move = move
+                best_piece = gameBoard.chessBoard[row][col]  # Get the piece at the start position
+
     return best_piece, best_move
 
 
 
-# jeffrey task
-# write a function that takes in one parameter which is always going to be gameBoard from main and will return the piece that is going to move and the row and col to move to
-# To summarize:
-# Input: instance of type Board (will always be gameBoard)
-# Output: piece(the actual INSTANCE such as the knight or pawn object as we can see in the debugger), row and col to move to
+def temp_move(temp_board, move):
+    row, col, new_row, new_col = move
+    if new_row==4 and new_col==1:
+        pass
+    piece_to_move = temp_board.chessBoard[row][col]
+    if piece_to_move:  # Check if there's a piece at the given position
+        list_of_moves_for_piece_to_move = temp_board.valid_moves(piece_to_move.position)
+        if list_of_moves_for_piece_to_move:  # Check if valid_moves returned moves
+            temp_board.make_move(new_row, new_col, list_of_moves_for_piece_to_move, piece_to_move)
+
+
+
+def unmake_move(self, move):
+    start_row, start_col, end_row, end_col = move
+    piece_moved = self.chessBoard[end_row][end_col]
+    if piece_moved is None:
+        pass
+    elif piece_moved.piece_type == "king":
+        # Check if the moved piece is a king
+        if piece_moved.colour == "white":
+            self.white_king_pos = (start_row, start_col)
+        elif piece_moved.colour == "black":
+            self.black_king_pos = (start_row, start_col)
+
+    piece_moved.position = (start_row, start_col)
+
+    # Update the board representation
+    self.chessBoard[start_row][start_col] = piece_moved
+    self.chessBoard[end_row][end_col] = None
+
+
+
+
 def random_moves(gameBoard, colour_parameter):
     colour = colour_parameter
     pieces = []
@@ -38,25 +80,21 @@ def random_moves(gameBoard, colour_parameter):
             if piece is not None and piece.colour == colour:
                 pieces.append(piece)
 
-    if pieces:  # Check if there are any white pieces
-        random_piece = choice(pieces)  # Choose a random piece from the list
-        random_piece_moves = gameBoard.valid_moves(random_piece.position)  # Get valid moves for the random piece
-        if random_piece_moves:  # Check if there are any valid moves
-            random_move = choice(random_piece_moves)  # Choose a random move for the random piece
-            return random_piece, random_move  # Return the piece and the randomly selected move
+    if pieces:
+        random_piece = choice(pieces)
+        random_piece_moves = gameBoard.valid_moves(random_piece.position)
+        if random_piece_moves:
+            random_move = choice(random_piece_moves)
+            return random_piece, random_move
         while not random_piece_moves:
-            random_piece = choice(pieces)  # Choose a random piece from the list
+            random_piece = choice(pieces)
             random_piece_moves = gameBoard.valid_moves(random_piece.position)
-            if random_piece_moves:  # Check if there are any valid moves
-                random_move = choice(random_piece_moves)  # Choose a random move for the random piece
-                return random_piece, random_move  # Return the piece and the randomly selected move
-                continue
-            else:
-                if gameBoard.checkmate(colour) or gameBoard.stalemate(colour):
-                    return None
-                    continue
+            if random_piece_moves:
+                random_move = choice(random_piece_moves)
+                return random_piece, random_move
     else:
         return None
+
 
 def piece_values(gameBoard):
     white_values = 0
@@ -80,78 +118,51 @@ def piece_values(gameBoard):
                 elif piece.colour == "black":
                     black_values += value
 
-    piece_value_eval=white_values - black_values
+    piece_value_eval = white_values - black_values
     return piece_value_eval
 
-def minimax_alpha_beta(gameBoard, depth, alpha, beta, maximizingPlayer, colour_parameter):
-    colour = colour_parameter
-    if depth == 0 or gameBoard.checkmate(colour) or gameBoard.stalemate(colour):
+
+def maxi(gameBoard, depth, maximizingPlayer, colour_parameter):
+    if depth == 0:
         return eval(gameBoard)
-    gameBoard_copy = deepcopy(gameBoard)
-    if maximizingPlayer:
-        max_eval = float('-inf')
-        for move in get_all_moves(gameBoard,colour_parameter):
-            temp_move(gameBoard_copy,move)
-            eval_score = minimax_alpha_beta(gameBoard_copy, depth - 1, alpha, beta, False, colour)
-            max_eval = max(max_eval, eval_score)
-            alpha = max(alpha, eval_score)
-            if beta <= alpha:
-                break
-        return max_eval
-    else:
-        min_eval = float('inf')
-        for move in get_all_moves(gameBoard, colour_parameter):
-            gameBoard_copy = deepcopy(gameBoard)  # Create a copy of the game board
-            temp_move(gameBoard_copy, move)  # Apply the move to the copied game board
-            eval_score = minimax_alpha_beta(gameBoard_copy, depth - 1, alpha, beta, True, colour)
-            min_eval = min(min_eval, eval_score)
-            beta = min(beta, eval_score)
-            if beta <= alpha:
-                break
-        return min_eval
+    max_score = float('-inf')
+    for move in get_all_moves(gameBoard, 'white'):  # Assuming 'white' is the maximizing player
+        if move == (6, 1, 4, 1):
+            pass
+        temp_move(gameBoard, move)  # Make the temporary move
+        score = mini(gameBoard, depth - 1, False, colour_parameter)
+        max_score = max(max_score, score)
+        unmake_move(gameBoard, move)  # Unmake the temporary move
+    return max_score
 
 
-
-
-
-
+def mini(gameBoard, depth, maximizingPlayer, colour_parameter):
+    if depth == 0:
+        return -eval(gameBoard)
+    min_score = float('inf')
+    for move in get_all_moves(gameBoard, 'black'):# Assuming 'black' is the minimizing player
+        if move==(6,1,4,1):
+            pass
+        temp_move(gameBoard, move)  # Make the temporary move
+        score = maxi(gameBoard, depth - 1, True, colour_parameter)
+        min_score = min(min_score, score)
+        unmake_move(gameBoard, move)  # Unmake the temporary move
+    return min_score
 
 
 def get_all_moves(gameBoard, colour_parameter):
     colour = colour_parameter
     moves = []
-    pieces = []
-    for x in range(8):
-        for y in range(8):
-            piece = gameBoard.chessBoard[x][y]
-            if piece is not None and piece.colour == colour:
-                pieces.append(piece)
+    pieces = gameBoard.get_all_pieces(colour)
 
     for piece in pieces:
         piece_moves = gameBoard.valid_moves(piece.position)
-        moves.extend([(piece.position[0], piece.position[1], move) for move in piece_moves])
+        current_row, current_col = piece.position  # Extract current row and column
+        moves.extend([(current_row, current_col, move[0], move[1]) for move in piece_moves])  # Include current row and column
     return moves
-
-def temp_move(gameBoard,move):
-    original_board_state = deepcopy(gameBoard)
-    row, col, new_row, new_col = move
-    piece_to_move=gameBoard.chessBoard[row][col]
-    list_of_moves_for_piece_to_move=gameBoard.valid_moves(piece_to_move.position)
-    gameBoard.make_move(new_row,new_col,list_of_moves_for_piece_to_move,piece_to_move)
 
 
 def eval(gameBoard):
-    material_score=piece_values(gameBoard)
-    # You can add more evaluation factors here and calculate their scores
-    # For example:
-    # mobility_score = mobility_evaluation(gameBoard)
-    # pawn_structure_score = pawn_structure_evaluation(gameBoard)
-    # king_safety_score = king_safety_evaluation(gameBoard)
-    # Combine the scores into a single evaluation score
-    combined_score = material_score  # Initialize with material score
-    # Combine with other scores if applicable
-    # combined_score += mobility_score
-    # combined_score += pawn_structure_score
-    # combined_score += king_safety_score
+    material_score = piece_values(gameBoard)
+    combined_score = material_score
     return combined_score
-

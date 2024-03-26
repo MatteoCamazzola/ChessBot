@@ -8,7 +8,7 @@ root.title("Chessboard")
 canvas = tk.Canvas(root, width=472, height=472)
 canvas.pack()
 
-current_player = "white"
+current_player = "black"
 selected_piece = None
 square_size = 59
 gameBoard = Board()
@@ -107,7 +107,7 @@ def on_canvas_click(event):
                 bot_colour = "black"
             else:
                 bot_colour = "white"
-            bot_move = get_best_move(gameBoard,3, bot_colour)
+            bot_move = get_best_move(gameBoard,3,bot_colour)
             if bot_move is not None:
                 gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                                     bot_move[0])

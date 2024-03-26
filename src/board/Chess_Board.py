@@ -714,4 +714,19 @@ class Board:
         return pieces
 
 
+    def get_all_pieces(self, colour):
+        pieces = []
+        for i in range(8):
+            for j in range(8):
+                piece = self.chessBoard[i][j]
+                if piece is not None and piece.colour == colour:
+                    pieces.append(piece)
+        return pieces
 
+    def copy_board(gameBoard):
+        # Create a new Board object or 2D list and copy the array data
+        new_board = Board()  # Assuming you have a Board class to represent the chess board
+        for i in range(8):
+            for j in range(8):
+                new_board.chessBoard[i][j] = gameBoard.chessBoard[i][j]
+        return new_board

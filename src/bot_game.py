@@ -6,12 +6,12 @@ from src.bot.algorthim import get_best_move
 from src.bot.algorthim import random_moves
 import csv
 import os
+import random
 
 root = tk.Tk()
 root.title("Chessboard")
 canvas = tk.Canvas(root, width=472, height=472)
 canvas.pack()
-
 
 play_as_bot = True
 selected_colour = "white"
@@ -103,7 +103,7 @@ def on_canvas_click(event):
             root.after(200, lambda: check_for_game_over(checkmate_check_colour))
             current_player_swap()
             # bot move
-            bot_move = random_moves(gameBoard, 3, current_player)
+            bot_move = random_moves(gameBoard, 3, current_player, opening_data)
             if bot_move is not None:
                 if gameBoard.number_of_moves_made < 20:
                     pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
@@ -139,11 +139,7 @@ def on_canvas_click(event):
             root.after(200, lambda: check_for_game_over(checkmate_check_colour))
             current_player_swap()
             # bot move
-            if current_player == "white":
-                bot_colour = "black"
-            else:
-                bot_colour = "white"
-            bot_move = get_best_move(gameBoard,3,bot_colour)
+            bot_move = random_moves(gameBoard, 3, current_player, opening_data)
 
             if bot_move is not None:
                 if gameBoard.number_of_moves_made < 20:
@@ -156,6 +152,8 @@ def on_canvas_click(event):
                                     bot_move[0])
                 place_pieces()
                 current_player_swap()
+            else:
+                pass
 
     # capture piece
     if selected_piece != None:
@@ -174,7 +172,7 @@ def on_canvas_click(event):
                 root.after(200, lambda: check_for_game_over(checkmate_check_colour))
                 current_player_swap()
                 # bot move
-                bot_move = random_moves(gameBoard, 3, current_player)
+                bot_move = random_moves(gameBoard, 3, current_player, opening_data)
                 if bot_move is not None:
                     pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
                     gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
@@ -287,20 +285,25 @@ def current_player_swap():
 
 # note this may only be called after a move is made will translate the move that was just made
 def translator_to_pgn(row_to_move, col_to_move, piece_to_move):
-    files = 'abcdefgh'
+    files = 'hgfedcba'
     ranks = '87654321'
+    # Adjust for the board setup: invert the row indexing to match PGN ranks
+    # (since your setup has row 0 at '8' in PGN and row 7 at '1' in PGN)
+    pgn_row_to_move = 7 - row_to_move
+    pgn_row_from = 7 - piece_to_move.position[0]
 
     # Determine if there's a capture
-    is_capture = gameBoard.chessBoard[row_to_move][col_to_move] is not None and gameBoard.chessBoard[row_to_move][
-        col_to_move].colour != piece_to_move.colour
+    is_capture = gameBoard.chessBoard[row_to_move][col_to_move] is not None and \
+                 gameBoard.chessBoard[row_to_move][col_to_move].colour != piece_to_move.colour
 
-    # Get the piece type and current position
+    # Get the piece type
     piece_type = piece_to_move.piece_type.capitalize()
-    current_row, current_col = piece_to_move.position
+    if piece_type == 'Knight':  # Special case for Knight, since 'K' is for King
+        piece_type = 'N'
 
     # Translate the current and target positions to PGN format
-    from_square = files[current_col] + ranks[current_row]
-    to_square = files[col_to_move] + ranks[row_to_move]
+    from_square = files[piece_to_move.position[1]] + ranks[pgn_row_from]
+    to_square = files[col_to_move] + ranks[pgn_row_to_move]
 
     # Construct the move notation
     move = ''
@@ -310,7 +313,7 @@ def translator_to_pgn(row_to_move, col_to_move, piece_to_move):
         else:
             move = to_square
     else:
-        move = piece_type[0] + ('x' if is_capture else '') + to_square
+        move = piece_type + ('x' if is_capture else '') + to_square
 
     # simulate move
 
@@ -337,7 +340,6 @@ def translator_to_pgn(row_to_move, col_to_move, piece_to_move):
             gameBoard.black_king_pos = temp_black
         else:
             gameBoard.white_king_pos = temp_white
-
     if gameBoard.chessBoard[row_to_move][col_to_move] != None:
         if gameBoard.chessBoard[row_to_move][col_to_move].colour == piece_to_move.colour:
             if abs(gameBoard.chessBoard[row_to_move][col_to_move].position[1] - piece_to_move.position[1]) > 3:
@@ -361,10 +363,17 @@ def read_tsv(file_path):
 
 draw_chessboard()
 place_pieces()
-
+opening_data = read_tsv(tsv_file_path)
 if (play_as_bot and selected_colour == "white") or (selected_colour == "black" and not play_as_bot):
     bot_colour = selected_colour
-    bot_move = random_moves(gameBoard, 3, bot_colour)
+    if bot_colour == "white":
+        move = random.choice([0,1])
+        if move == 0:
+            bot_move = [gameBoard.chessBoard[1][4], (3,4)]
+        else:
+            bot_move = [gameBoard.chessBoard[1][3], (3, 3)]
+    else:
+        bot_move = random_moves(gameBoard, 3, bot_colour, opening_data)
     if bot_move is not None:
         if gameBoard.number_of_moves_made < 20:
             pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
@@ -372,13 +381,11 @@ if (play_as_bot and selected_colour == "white") or (selected_colour == "black" a
             gameBoard.previous_moves += (
                                             f"{gameBoard.number_of_moves_made // 2 + 1}." if gameBoard.number_of_moves_made % 2 == 1 else '') + f" {pgn_move} "
 
-
         gameBoard.make_move(bot_move[1][0], bot_move[1][1], gameBoard.valid_moves(bot_move[0].position),
                             bot_move[0])
         place_pieces()
         current_player_swap()
 
-opening_data = read_tsv(tsv_file_path)
 pgn_move = translator_to_pgn(2, 0, gameBoard.chessBoard[0][0])
 canvas.bind("<Button-1>", on_canvas_click)
 root.mainloop()

@@ -3,6 +3,7 @@ import math
 best_piece = None
 best_move = None
 from src.pieces.queen import Queen
+from src.pieces.pawn import Pawn
 import re
 
 def get_best_move(gameBoard, depth, colour_parameter):
@@ -14,9 +15,9 @@ def get_best_move(gameBoard, depth, colour_parameter):
     if maximizingPlayer:
         for move in get_all_moves(gameBoard, colour_parameter):
             row, col, new_row, new_col = move  # Unpack the move tuple
-            temp_move(gameBoard, move)
-            eval_score = mini(gameBoard, depth - 1, False, colour_parameter)
-            unmake_move(gameBoard, move)  # Undo the move
+            has_moved_swapped,captured_pieces,original_piece=temp_move(gameBoard, move,gameBoard.last_move)
+            eval_score = mini(gameBoard, depth - 1, False, colour_parameter,move)
+            unmake_move(gameBoard, move,has_moved_swapped,captured_pieces,original_piece)  # Undo the move
             if eval_score > best_score:
                 best_score = eval_score
                 row, col, new_row, new_col= move
@@ -25,9 +26,9 @@ def get_best_move(gameBoard, depth, colour_parameter):
     else:
         for move in get_all_moves(gameBoard, colour_parameter):
             row, col, new_row, new_col = move  # Unpack the move tuple
-            temp_move(gameBoard, move)
-            eval_score = maxi(gameBoard, depth - 1, True, colour_parameter)
-            unmake_move(gameBoard, move)  # Undo the move
+            has_moved_swapped, captured_pieces, original_piece = temp_move(gameBoard, move, gameBoard.last_move)
+            eval_score = maxi(gameBoard, depth - 1, True, colour_parameter,move)
+            unmake_move(gameBoard, move, has_moved_swapped, captured_pieces, original_piece)  # Undo the move
             if eval_score < best_score:
                 best_score = eval_score
                 row, col, new_row, new_col=move
@@ -35,50 +36,308 @@ def get_best_move(gameBoard, depth, colour_parameter):
                 best_piece = gameBoard.chessBoard[row][col]  # Get the piece at the start position
 
     return best_piece, best_move
-def temp_move(temp_board, move):
+def temp_move(temp_board, move,last_move):
+    has_moved_swapped=False
     row, col, new_row, new_col = move
-    if new_row == 4 and new_col == 1:
-        pass
+    original_piece=None
+    captured_pieces = []
+    if last_move is not None and len(last_move)==4:
+        if temp_board.chessBoard[last_move[2]][last_move[3]] is None:
+            last_move_temp=None
+        else:
+            last_move_temp=[last_move[0],last_move[1],temp_board.chessBoard[last_move[2]][last_move[3]].piece_type, temp_board.chessBoard[last_move[2]][last_move[3]].colour,last_move[2],last_move[3]]
+    else:
+        last_move_temp=last_move
     piece_to_move = temp_board.chessBoard[row][col]
 
-    if piece_to_move:  # Check if there's a piece at the given position
-        # Check for pawn promotion
-        if piece_to_move.piece_type == "pawn" and (new_row == 0 or new_row == 7):
-            # Promote the pawn to a queen
-            promoted_piece = Queen(piece_to_move.colour, new_row, new_col)
-            temp_board.chessBoard[new_row][new_col] = promoted_piece
-            return  # Exit the function without calling make_move
-        list_of_moves_for_piece_to_move = temp_board.valid_moves(piece_to_move.position)
-        if list_of_moves_for_piece_to_move:  # Check if valid_moves returned moves
-            # Make the move and check if a capture occurred
-            captured_piece = temp_board.make_move(new_row, new_col, list_of_moves_for_piece_to_move, piece_to_move)
-            if captured_piece:
-                temp_board.captured_pieces[int(captured_piece.colour == "black")].append(captured_piece)
+    if piece_to_move:
+        if temp_board.chessBoard[new_row][new_col] is not None and piece_to_move.colour==temp_board.chessBoard[new_row][new_col].colour:
 
-def unmake_move(self, move):
+            if abs(piece_to_move.position[1] - new_col) == 3:
+                temp_board.chessBoard[new_row][3].has_moved = True
+                temp_board.chessBoard[new_row][3].position = (new_row, 1)
+                temp_board.chessBoard[new_row][0].has_moved = True
+                temp_board.chessBoard[new_row][0].position = (new_row, 2)
+
+                temp_board.chessBoard[new_row][1] = temp_board.chessBoard[new_row][3]
+                temp_board.chessBoard[new_row][2] = temp_board.chessBoard[new_row][0]
+                temp_board.chessBoard[new_row][3] = None
+                temp_board.chessBoard[new_row][0] = None
+
+                if piece_to_move.colour == "white":
+                    temp_board.white_king_pos = (0, 1)
+                else:
+                    temp_board.black_king_pos = (7, 1)
+
+            else:
+                temp_board.chessBoard[new_row][3].has_moved = True
+                temp_board.chessBoard[new_row][3].position = (new_row, 5)
+                temp_board.chessBoard[new_row][7].has_moved = True
+                temp_board.chessBoard[new_row][7].position = (new_row, 4)
+
+                temp_board.chessBoard[new_row][5] = temp_board.chessBoard[new_row][3]
+                temp_board.chessBoard[new_row][4] = temp_board.chessBoard[new_row][7]
+                temp_board.chessBoard[new_row][3] = None
+                temp_board.chessBoard[new_row][7] = None
+
+                if piece_to_move.colour == "white":
+                    temp_board.white_king_pos = (0, 5)
+                else:
+                    temp_board.black_king_pos = (7, 5)
+
+        else:
+            if temp_board.chessBoard[new_row][new_col] == None:
+                if last_move_temp is not None:
+                    init_row,init_col,last_piece_type,last_piece_colour,last_row,last_col=last_move_temp
+                if piece_to_move.piece_type=="rook":
+                    if piece_to_move.has_moved==False:
+                        has_moved_swapped=True
+                    piece_to_move.has_moved=True
+                    temp_board.chessBoard[row][col] = None
+                    temp_board.chessBoard[new_row][new_col] = piece_to_move
+                    piece_to_move.position = new_row, new_col
+                elif piece_to_move.piece_type == "king" and piece_to_move.colour == "white":
+                    if piece_to_move.has_moved==False:
+                        has_moved_swapped=True
+                    piece_to_move.has_moved = True
+                    temp_board.chessBoard[row][col] = None
+                    temp_board.white_king_pos = (new_row, new_col)
+                    temp_board.chessBoard[new_row][new_col] = piece_to_move
+                    piece_to_move.position = new_row, new_col
+                elif piece_to_move.piece_type == "king" and piece_to_move.colour == "black":
+                    if piece_to_move.has_moved==False:
+                        has_moved_swapped=True
+                    piece_to_move.has_moved = True
+                    temp_board.chessBoard[row][col] = None
+                    temp_board.black_king_pos = (new_row, new_col)
+                    temp_board.chessBoard[new_row][new_col] = piece_to_move
+                    piece_to_move.position = new_row, new_col
+                elif piece_to_move.piece_type == "pawn":
+                    if piece_to_move.colour == "white" and row == 1 and new_row == 3:
+                        last_move_temp = [new_row, new_col, piece_to_move.piece_type, piece_to_move.colour, row, col]
+                        temp_board.chessBoard[row][col] = None
+                        temp_board.chessBoard[new_row][new_col] = piece_to_move
+                        piece_to_move.position = new_row, new_col
+                    elif piece_to_move.colour == "black" and row == 6 and new_row == 4:
+                        last_move_temp = [new_row, new_col, piece_to_move.piece_type, piece_to_move.colour, row, col]
+                        temp_board.chessBoard[row][col] = None
+                        temp_board.chessBoard[new_row][new_col] = piece_to_move
+                        piece_to_move.position = new_row, new_col
+                    elif (new_row == 0 or new_row == 7):
+                        promoted_piece = Queen(piece_to_move.colour, new_row, new_col)
+                        temp_board.chessBoard[row][col] = None
+                        temp_board.chessBoard[new_row][new_col] = promoted_piece
+                        original_piece= temp_board.chessBoard[row][col]
+                    elif last_move_temp is not None and last_piece_type == "pawn" and piece_to_move.colour != last_piece_colour and abs(init_row - last_row) == 2 and abs(last_row - piece_to_move.position[0]) == 0 and abs(last_col - piece_to_move.position[1]) == 1 and new_col==last_col and abs(new_row-last_row)==1 :
+                        if piece_to_move.colour == "white":
+                            en_passant_row = piece_to_move.position[0] + 1
+                            en_passant_col = last_col
+                        else:
+                            en_passant_row = piece_to_move.position[0] - 1
+                            en_passant_col = last_col
+                        temp_board.chessBoard[last_row][last_col] = None
+                        temp_board.chessBoard[en_passant_row][en_passant_col] = piece_to_move
+                        temp_board.chessBoard[row][col] = None
+                        piece_to_move.position = en_passant_row,en_passant_col
+                        last_temp_move = temp_board.last_move
+                    else:
+                        temp_board.chessBoard[new_row][new_col]=piece_to_move
+                        piece_to_move.position=new_row,new_col
+                        temp_board.chessBoard[row][col]
+                else:
+                    temp_board.chessBoard[new_row][new_col] = piece_to_move
+                    piece_to_move.position = new_row, new_col
+                    temp_board.chessBoard[row][col]
+
+            if temp_board.chessBoard[new_row][new_col] != None:
+                if piece_to_move.piece_type=="rook":
+                    if piece_to_move.has_moved==False:
+                        has_moved_swapped=True
+                    piece_to_move.has_moved=True
+                    captured_piece = temp_board.chessBoard[new_row][new_col]
+                    if captured_piece.colour == "white":
+                        captured_pieces.append(captured_piece)  # Append to white captures
+                    elif captured_piece.colour == "black":
+                        captured_pieces.append(captured_piece)
+                    temp_board.chessBoard[new_row][new_col] = None
+                    temp_board.chessBoard[new_row][new_col] = piece_to_move
+                    temp_board.chessBoard[row][col] = None
+                    piece_to_move.position = new_row, new_col
+                elif piece_to_move.piece_type == "king" and piece_to_move.colour == "white":
+                    if piece_to_move.has_moved==False:
+                        has_moved_swapped=True
+                    piece_to_move.has_moved = True
+                    captured_piece = temp_board.chessBoard[new_row][new_col]
+                    if captured_piece.colour == "white":
+                        captured_pieces.append(captured_piece)  # Append to white captures
+                    elif captured_piece.colour == "black":
+                        captured_pieces.append(captured_piece)
+                    temp_board.chessBoard[new_row][new_col] = None
+                    temp_board.white_king_pos = (new_row, new_col)
+                    temp_board.chessBoard[new_row][new_col] = piece_to_move
+                    temp_board.chessBoard[row][col] = None
+                    piece_to_move.position = new_row, new_col
+                elif piece_to_move.piece_type == "king" and piece_to_move.colour == "black":
+                    if piece_to_move.has_moved==False:
+                        has_moved_swapped=True
+                    piece_to_move.has_moved = True
+                    captured_piece = temp_board.chessBoard[new_row][new_col]
+                    if captured_piece.colour == "white":
+                        captured_pieces.append(captured_piece)  # Append to white captures
+                    elif captured_piece.colour == "black":
+                        captured_pieces.append(captured_piece)
+                    temp_board.chessBoard[new_row][new_col] = None
+                    temp_board.black_king_pos = (new_row, new_col)
+                    temp_board.chessBoard[new_row][new_col] = piece_to_move
+                    temp_board.chessBoard[row][col] = None
+                    piece_to_move.position = new_row, new_col
+                elif piece_to_move.piece_type == "pawn" and (new_row == 0 or new_row == 7):
+                    captured_piece = temp_board.chessBoard[new_row][new_col]
+                    if captured_piece.colour == "white":
+                        captured_pieces.append(captured_piece)  # Append to white captures
+                    elif captured_piece.colour == "black":
+                        captured_pieces.append(captured_piece)
+                    temp_board.chessBoard[new_row][new_col] = None
+                    promoted_piece = Queen(piece_to_move.colour, new_row, new_col)
+                    original_piece = temp_board.chessBoard[row][col]
+                    temp_board.chessBoard[new_row][new_col] = promoted_piece
+                    temp_board.chessBoard[row][col] = None
+                    original_piece=temp_board.chessBoard[row][col]
+                else:
+                    captured_piece = temp_board.chessBoard[new_row][new_col]
+                    if captured_piece.colour == "white":
+                        captured_pieces.append(captured_piece)  # Append to white captures
+                    elif captured_piece.colour == "black":
+                        captured_pieces.append(captured_piece)
+                    temp_board.chessBoard[new_row][new_col] = None
+                    temp_board.chessBoard[new_row][new_col] = piece_to_move
+                    temp_board.chessBoard[row][col] = None
+                    piece_to_move.position=new_row,new_col
+    return has_moved_swapped,captured_pieces,original_piece
+def unmake_move(temp_board, move, has_moved_swapped,captured_pieces,original_piece):
     start_row, start_col, end_row, end_col = move
-    piece_moved = self.chessBoard[end_row][end_col]
-
+    piece_moved = temp_board.chessBoard[end_row][end_col]
     if piece_moved is None:
         pass
-    elif piece_moved.piece_type == "king":
-        # Check if the moved piece is a king
-        if piece_moved.colour == "white":
-            self.white_king_pos = (start_row, start_col)
-        elif piece_moved.colour == "black":
-            self.black_king_pos = (start_row, start_col)
+   # ----------------------------------------------------------------------------------------------------------------------------
+    if piece_moved==None:
+        if start_col==0:
+            piece_moved=temp_board.chessBoard[start_row][end_col-1]
+        if end_col==0:
+            piece_moved=temp_board.chessBoard[start_row][end_col+1]
+        if end_col==7:
+            piece_moved=temp_board.chessBoard[start_row][end_col-2]
+        if start_col==7:
+            piece_moved=temp_board.chessBoard[start_row][end_col+1]
+        if piece_moved.piece_type == "king":
+            if piece_moved.colour == "white" and abs(start_col-end_col)==4:#queenside
+                temp_board.white_king_pos = (start_row, start_col)
+                piece_moved.has_moved=False
+                rook=temp_board.chessBoard[end_row][start_col+1]
+                temp_board.chessBoard[end_row][end_col]=rook
+                temp_board.chessBoard[end_row][start_col+1]=None
+                rook.position=end_row,end_col
+                rook.has_moved=False
+                temp_board.chessBoard[start_row][start_col]=piece_moved
+                temp_board.chessBoard[end_row][start_col+2]=None
+                piece_moved.position=(start_row,start_col)
 
-    piece_moved.position = (start_row, start_col)
 
-    # Update the board representation
-    self.chessBoard[start_row][start_col] = piece_moved
-    self.chessBoard[end_row][end_col] = None
+            elif piece_moved.colour == "black" and abs(start_col-end_col)==4:
+                temp_board.black_king_pos = (start_row, start_col)
+                piece_moved.has_moved = False
+                rook = temp_board.chessBoard[end_row][start_col+1]
+                temp_board.chessBoard[end_row][end_col] = rook
+                temp_board.chessBoard[end_row][start_col+1] = None
+                rook.position = end_row, end_col
+                rook.has_moved = False
+                temp_board.chessBoard[start_row][start_col] = piece_moved
+                temp_board.chessBoard[end_row][start_col + 2] = None
+                piece_moved.position = (start_row,start_col)
 
-    # Restore captured pieces to the board
-    for colour_pieces in self.captured_pieces:
-        for captured_piece in colour_pieces:
-            if captured_piece:
-                self.chessBoard[captured_piece.position[0]][captured_piece.position[1]] = captured_piece
+            elif piece_moved.colour == "white" and abs(start_col-end_col)==3:#kingside
+                temp_board.white_king_pos = (start_row, start_col)
+                piece_moved.has_moved = False
+                rook = temp_board.chessBoard[end_row][start_col-1]
+                temp_board.chessBoard[end_row][end_col] = rook
+                temp_board.chessBoard[end_row][start_col-1] = None
+                rook.position = end_row, end_col
+                rook.has_moved = False
+                temp_board.chessBoard[start_row][start_col] = piece_moved
+                temp_board.chessBoard[end_row][start_col-2] = None
+                piece_moved.position = (start_row,start_col)
+            elif piece_moved.colour == "black" and abs(start_col-end_col)==3:
+                temp_board.black_king_pos = (start_row, start_col)
+                piece_moved.has_moved = False
+                rook = temp_board.chessBoard[end_row][start_col-1]
+                temp_board.chessBoard[end_row][end_col] = rook
+                temp_board.chessBoard[end_row][start_col-1] = None
+                rook.position = end_row, end_col
+                rook.has_moved = False
+                temp_board.chessBoard[start_row][start_col] = piece_moved
+                temp_board.chessBoard[end_row][start_col-2] = None
+                piece_moved.position = (start_row,start_col)
+
+        if piece_moved.piece_type=="rook":
+            if start_col==0 and end_col==3 and temp_board.chessBoard[end_row][start_col+1] is not None and piece_moved.colour=="white":
+                king=temp_board.chessBoard[end_row][start_col+1]
+                temp_board.chessBoard[end_row][end_col]=king
+                temp_board.chessBoard[end_row][start_col+1]=None
+                king.position=end_row,end_col
+                temp_board.white_king_pos=(end_row,end_col)
+                piece_moved.has_moved = False
+                king.has_moved = False
+                temp_board.chessBoard[start_row][start_col]=piece_moved
+                temp_board.chessBoard[start_row][end_col-1]=None
+                piece_moved.position=start_row,start_col
+            elif start_col==0 and end_col==3 and temp_board.chessBoard[end_row][start_col+1] is not None and piece_moved.colour=="black":
+                king=temp_board.chessBoard[end_row][start_col+1]
+                temp_board.chessBoard[end_row][end_col]=king
+                temp_board.chessBoard[end_row][start_col+1]=None
+                king.position=end_row,end_col
+                temp_board.black_king_pos=(end_row,end_col)
+                piece_moved.has_moved = False
+                king.has_moved = False
+                temp_board.chessBoard[start_row][start_col] = piece_moved
+                temp_board.chessBoard[start_row][end_col - 1] = None
+                piece_moved.position = start_row, start_col
+            elif start_col==7 and end_col==3 and temp_board.chessBoard[end_row][start_col-2] and piece_moved.colour=="white":
+                king=temp_board.chessBoard[end_row][start_col-2]
+                temp_board.chessBoard[end_row][end_col]=king
+                temp_board.chessBoard[end_row][start_col-2]=None
+                king.position=end_row,end_col
+                temp_board.white_king_pos=(end_row,end_col)
+                piece_moved.has_moved = False
+                king.has_moved = False
+                temp_board.chessBoard[start_row][start_col] = piece_moved
+                temp_board.chessBoard[start_row][end_col + 1] = None
+                piece_moved.position = start_row, start_col
+            elif start_col == 7 and end_col == 3 and temp_board.chessBoard[end_row][start_col-2] and piece_moved.colour=="black":
+                king = temp_board.chessBoard[end_row][start_col - 2]
+                temp_board.chessBoard[end_row][end_col] = king
+                temp_board.chessBoard[end_row][start_col - 2] = None
+                king.position = end_row, end_col
+                temp_board.black_king_pos = (end_row, end_col)
+                piece_moved.has_moved = False
+                king.has_moved = False
+                temp_board.chessBoard[start_row][start_col] = piece_moved
+                temp_board.chessBoard[start_row][end_col + 1] = None
+                piece_moved.position = start_row, start_col
+# ----------------------------------------------------------------------------------------------------------------------
+    else:
+        if has_moved_swapped == True:
+            piece_moved.has_moved = False
+        if piece_moved.colour == "white" and piece_moved.piece_type=="king":
+            temp_board.white_king_pos = (start_row, start_col)
+        elif piece_moved.colour == "black" and piece_moved.piece_type=="king":
+            temp_board.black_king_pos = (start_row, start_col)
+        elif original_piece is not None:
+            temp_board.chessBoard[end_row][end_col] = Pawn(piece_moved.colour,end_row,end_col)
+            piece_moved=temp_board.chessBoard[end_row][end_col]
+        temp_board.chessBoard[start_row][start_col] = piece_moved
+        temp_board.chessBoard[end_row][end_col]=None
+        piece_moved.position=start_row,start_col
+        temp_board.chessBoard[captured_pieces[0].position[0]][captured_pieces[0].position[1]]=captured_pieces[0]
 
 def random_moves(gameBoard, hi, colour_parameter, theory_list):
     if gameBoard.number_of_moves_made < 20:
@@ -139,27 +398,27 @@ def piece_values(gameBoard):
     return piece_value_eval
 
 
-def maxi(gameBoard, depth, maximizingPlayer, colour_parameter):
+def maxi(gameBoard, depth, maximizingPlayer, colour_parameter,last_move):
     if depth == 0:
         return eval(gameBoard)
     max_score = float('-inf')
     for move in get_all_moves(gameBoard, 'white'):  # Assuming 'white' is the maximizing player
-        temp_move(gameBoard, move)  # Make the temporary move
-        score = mini(gameBoard, depth - 1, False, colour_parameter)
+        has_moved_swapped,captured_pieces,original_piece=temp_move(gameBoard, move,last_move)  # Make the temporary move
+        score = mini(gameBoard, depth - 1, False, colour_parameter,move)
         max_score = max(max_score, score)
-        unmake_move(gameBoard, move)  # Unmake the temporary move
+        unmake_move(gameBoard, move,has_moved_swapped,captured_pieces,original_piece)  # Unmake the temporary move
     return max_score
 
 
-def mini(gameBoard, depth, maximizingPlayer, colour_parameter):
+def mini(gameBoard, depth, maximizingPlayer, colour_parameter,last_move):
     if depth == 0:
         return -eval(gameBoard)
     min_score = float('inf')
     for move in get_all_moves(gameBoard, 'black'):# Assuming 'black' is the minimizing player
-        temp_move(gameBoard, move)  # Make the temporary move
-        score = maxi(gameBoard, depth - 1, True, colour_parameter)
+        has_moved_swapped,captured_pieces,original_piece=temp_move(gameBoard, move,last_move)  # Make the temporary move
+        score = maxi(gameBoard, depth - 1, True, colour_parameter,move)
         min_score = min(min_score, score)
-        unmake_move(gameBoard, move)  # Unmake the temporary move
+        unmake_move(gameBoard, move,has_moved_swapped,captured_pieces,original_piece)  # Unmake the temporary move
     return min_score
 
 

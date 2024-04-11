@@ -24,14 +24,14 @@ class Board:
         pawn_black_7 = Pawn("black", 6, 6)
         pawn_black_8 = Pawn("black", 6, 7)
 
-        rook_black_1 = Rook("black", 7, 7)
+        rook_black_1 = Rook("black", 5, 2)
         rook_black_2 = Rook("black", 7, 0)
         knight_black_1 = Knight("black", 7, 6)
         knight_black_2 = Knight("black", 7, 1)
         bishop_black_1 = Bishop("black", 7, 2)
         bishop_black_2 = Bishop("black", 7, 5)
 
-        queen_black = Queen("black", 7, 4)
+        queen_black = Queen("black", 4, 2)
         king_black = King("black", 7, 3)
 
         pawn_white_1 = Pawn("white", 1, 0)

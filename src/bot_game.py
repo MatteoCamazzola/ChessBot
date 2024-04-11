@@ -103,7 +103,7 @@ def on_canvas_click(event):
             root.after(200, lambda: check_for_game_over(checkmate_check_colour))
             current_player_swap()
             # bot move
-            bot_move = random_moves(gameBoard, 3, current_player, opening_data)
+            bot_move = get_best_move(gameBoard, 3, current_player)
             if bot_move is not None:
                 if gameBoard.number_of_moves_made < 20:
                     pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
@@ -139,7 +139,7 @@ def on_canvas_click(event):
             root.after(200, lambda: check_for_game_over(checkmate_check_colour))
             current_player_swap()
             # bot move
-            bot_move = random_moves(gameBoard, 3, current_player, opening_data)
+            bot_move = get_best_move(gameBoard, 3, current_player)
 
             if bot_move is not None:
                 if gameBoard.number_of_moves_made < 20:
@@ -172,7 +172,7 @@ def on_canvas_click(event):
                 root.after(200, lambda: check_for_game_over(checkmate_check_colour))
                 current_player_swap()
                 # bot move
-                bot_move = random_moves(gameBoard, 3, current_player, opening_data)
+                bot_move = get_best_move(gameBoard, 3, current_player)
                 if bot_move is not None:
                     pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
                     gameBoard.number_of_moves_made = gameBoard.number_of_moves_made + 1
@@ -373,7 +373,7 @@ if (play_as_bot and selected_colour == "white") or (selected_colour == "black" a
         else:
             bot_move = [gameBoard.chessBoard[1][3], (3, 3)]
     else:
-        bot_move = random_moves(gameBoard, 3, bot_colour, opening_data)
+        bot_move = get_best_move(gameBoard, 3, bot_colour)
     if bot_move is not None:
         if gameBoard.number_of_moves_made < 20:
             pgn_move = translator_to_pgn(bot_move[1][0], bot_move[1][1], bot_move[0])
